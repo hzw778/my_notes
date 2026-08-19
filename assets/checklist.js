@@ -168,7 +168,10 @@
       html += '<div class="linkgrid">';
       g.items.forEach(function (it) {
         var isPdf = !!it.pdf;
-        var url = isPdf ? encodeURI(it.pdf) : (it.local ? "#" : "https://utxc8uqzfk.feishu.cn/wiki/" + it.token);
+        var url;
+        if (isPdf) url = encodeURI(it.pdf);
+        else if (it.href) url = it.href;
+        else url = it.local ? "#" : "https://utxc8uqzfk.feishu.cn/wiki/" + it.token;
         var desc = it.note ? esc(it.note) : "";
         if (!desc && isPdf) desc = (it.size || "") + (it.size ? " · " : "") + "PDF 原文阅读";
         if (!desc) {
@@ -180,9 +183,15 @@
             desc = st2 ? st2.count + " 题 · 含完整答案" : "含完整答案";
           }
         }
-        var stTxt = isPdf ? "PDF" : (it.status === "full" ? "全文+答案" : it.status === "list" ? "全文+答案" : it.status === "mine" ? "已收录" : "无权限");
+        var stTxt;
+        if (isPdf) stTxt = "PDF";
+        else if (it.href) stTxt = "公众号";
+        else if (it.status === "full") stTxt = "全文+答案";
+        else if (it.status === "list") stTxt = "全文+答案";
+        else if (it.status === "mine") stTxt = "已收录";
+        else stTxt = "无权限";
         var goto = null;
-        if (!isPdf) {
+        if (!isPdf && !it.href) {
           if (it.status === "mine") goto = "mine";
           else if (it.key && DATA[it.key]) goto = it.key;
           else if (it.status === "list") goto = it.key;
@@ -196,7 +205,7 @@
           '<span class="ic">' + (it.icon || "📄") + "</span>" +
           '<span class="meta"><span class="t">' + esc(cleanTitle(it.title)) + "</span>" +
           (desc ? '<span class="d">' + desc + "</span>" : "") + "</span>" +
-          '<span class="st ' + (isPdf ? "pdf" : it.status) + '">' + stTxt + "</span></a>";
+          '<span class="st ' + (isPdf ? "pdf" : it.href ? "ext" : it.status) + '">' + stTxt + "</span></a>";
       });
       html += "</div></div>";
     });

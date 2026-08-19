@@ -63,6 +63,16 @@ window.LINKS = {
         { icon: "🌐", title: "计算机网络", pdf: "面渣逆袭+进阶之路/面渣逆袭计算机网络.pdf", size: "7.9 MB" },
         { icon: "📚", title: "Java 进阶之路", pdf: "面渣逆袭+进阶之路/二哥的 Java 进阶之路亮白版.pdf", size: "34.5 MB" }
       ]
+    },
+    {
+      name: "公众号专辑",
+      note: "微信公众号原文，含完整文字与配图，点击在新标签页阅读",
+      items: [
+        { icon: "🤖", title: "图解Agent", href: "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzUxODAzNDg4NQ==&action=getalbum&album_id=4404340926102421504&scene=21#wechat_redirect", note: "约 22 篇 · Agent 图文教程" },
+        { icon: "🗄️", title: "后端高频面试题", href: "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2OTA0Njk0OA==&action=getalbum&album_id=1352302538565189634&scene=126#wechat_redirect", note: "约 92 篇 · 后端八股汇编" },
+        { icon: "🧠", title: "AI 核心技术与面试实战", href: "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2OTA0Njk0OA==&action=getalbum&album_id=4412413577266053125&scene=126#wechat_redirect", note: "约 24 篇 · JavaGuide 出品" },
+        { icon: "🎯", title: "AI Agent 面试指南", href: "https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzk3NTQ2MTI2Mg==&action=getalbum&album_id=4103863406245920778&scene=126#wechat_redirect", note: "约 16 篇 · Agent 面试硬核篇" }
+      ]
     }
   ],
   url: function (token) { return "https://utxc8uqzfk.feishu.cn/wiki/" + token; }
