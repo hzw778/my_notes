@@ -37,10 +37,15 @@
   var DATA = window.TAB_DATA || {};
   var PATCH = window.TAB_PATCH || {};
   var OTHERS = (window.OTHERS || []).filter(function (d) { return !SKIP_OTHERS_KEYS[d.key]; });
-  var OTHER_KEYS = OTHERS.map(function (d) { return d.key; });
+  var OTHER_KEYS = [];
+  var OTHER_DEFS = [];
   var LINKS = window.LINKS || { groups: [] };
+  var othersLoaded = OTHERS.length > 0;
   var ICONS = {};
   LINKS.groups.forEach(function (g) { g.items.forEach(function (it) { if (it.key) ICONS[it.key] = it.icon; }); });
+  LINKS.groups.forEach(function (g) { g.items.forEach(function (it) { if (it.status === "list") OTHER_DEFS.push(it.key); }); });
+  function syncOtherKeys() { if (othersLoaded) OTHER_KEYS = OTHERS.map(function (d) { return d.key; }); else OTHER_KEYS = OTHER_DEFS; }
+  syncOtherKeys();
 
   var progress = {};
   try { progress = JSON.parse(localStorage.getItem(STORE_KEY) || "{}") || {}; } catch (e) { progress = {}; }
@@ -85,11 +90,11 @@
   function buildPanels() {
     var wrap = document.querySelector(".wrap");
     if (!wrap) return;
-    OTHERS.forEach(function (d) {
-      if (document.getElementById("panel-" + d.key)) return;
+    OTHER_DEFS.forEach(function (key) {
+      if (document.getElementById("panel-" + key)) return;
       var sec = document.createElement("section");
       sec.className = "panel";
-      sec.id = "panel-" + d.key;
+      sec.id = "panel-" + key;
       wrap.appendChild(sec);
     });
   }
@@ -125,6 +130,26 @@
       p.classList.toggle("active", p.id === "panel-" + key);
     });
     if (key === "overview" && window.APP_CHART && window.APP_CHART.resize) window.APP_CHART.resize();
+    var cur = (location.hash || "").replace(/^#/, "");
+    if (cur !== key && key) { try { history.replaceState(null, "", "#" + key); } catch (e) {} }
+    if (OTHER_KEYS.indexOf(key) >= 0 && !othersLoaded) loadOthers();
+  }
+
+  /* ---------- Lazy-load other docs ---------- */
+  function loadOthers() {
+    var s = document.createElement("script");
+    s.src = "assets/data-others.js";
+    s.onload = function () {
+      OTHERS = (window.OTHERS || []).filter(function (d) { return !SKIP_OTHERS_KEYS[d.key]; });
+      othersLoaded = true;
+      syncOtherKeys();
+      buildTabbar();
+      renderOverview();
+      OTHERS.forEach(renderOtherTab);
+      refreshAll();
+      if (state.tab && OTHER_KEYS.indexOf(state.tab) >= 0) switchTab(state.tab);
+    };
+    document.head.appendChild(s);
   }
 
   /* ---------- Overview ---------- */
@@ -490,7 +515,14 @@
   TAB_ORDER.forEach(renderTechTab);
   OTHERS.forEach(renderOtherTab);
   refreshAll();
-  switchTab("overview");
+
+  function hashTarget() {
+    var h = (location.hash || "").replace(/^#/, "").trim();
+    if (h && OTHER_KEYS.concat(["overview"]).concat(TAB_ORDER).indexOf(h) >= 0) return h;
+    return "overview";
+  }
+  window.addEventListener("hashchange", function () { switchTab(hashTarget()); });
+  switchTab(hashTarget());
 
   window.APP_STATE = { docStats: docStats, tabs: TAB_ORDER.concat(OTHER_KEYS) };
 })();
