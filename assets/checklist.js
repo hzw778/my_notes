@@ -441,7 +441,14 @@
   });
 
   /* ---------- PDF modal ---------- */
+  function isMobile() {
+    return window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  }
   function openPdf(src, title) {
+    if (isMobile()) {
+      window.open(src, "_blank", "noopener");
+      return true;
+    }
     var modal = document.getElementById("pdf-modal");
     var frame = document.getElementById("pdf-frame");
     var t = document.getElementById("pdf-modal-title");
