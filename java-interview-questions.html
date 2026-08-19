@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>面试速通全清单 · Java / Agent / Redis / MySQL / 大模型 / RAG …</title>
+<style>
+  @font-face { font-family: "JetBrainsMono"; src: url("./_shared/fonts/JetBrainsMono-Regular.ttf") format("truetype"); font-weight: 400; }
+  @font-face { font-family: "JetBrainsMono"; src: url("./_shared/fonts/JetBrainsMono-Bold.ttf") format("truetype"); font-weight: 700; }
+
+  :root {
+    --bg: #f5f7fd; --bg2: #ffffff; --ink: #17203a; --muted: #5c6a8a; --rule: #e4e9f5;
+    --accent: #3d5afe; --accent2: #f97316;
+    --p-must: #e11d48; --p-high: #f59e0b; --p-core: #3d5afe; --p-know: #64748b;
+    --mono: "JetBrainsMono", Consolas, monospace;
+    --sans: "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans SC", system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 12% 0%, rgba(61, 90, 254, 0.08), transparent),
+      radial-gradient(ellipse 50% 35% at 88% 6%, rgba(249, 115, 22, 0.07), transparent),
+      radial-gradient(ellipse 55% 40% at 50% 100%, rgba(61, 90, 254, 0.05), transparent);
+    background-attachment: fixed;
+    color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.7;
+    padding-bottom: 4rem;
+  }
+
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 1.25rem; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 3rem 0 1.6rem; }
+  .hero .kicker { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.18em; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.6rem; }
+  .hero h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); font-weight: 700; line-height: 1.25; }
+  .hero h1 em { font-style: normal; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero .sub { color: var(--muted); margin-top: 0.7rem; font-size: 0.95rem; max-width: 52rem; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-top: 1.5rem; }
+  .stat { background: rgba(255,255,255,0.72); backdrop-filter: blur(10px); border: 1px solid var(--rule); border-radius: 12px; padding: 0.9rem 0.8rem; text-align: center; }
+  .stat .num { font-family: var(--mono); font-size: 1.55rem; font-weight: 700; line-height: 1.15; }
+  .stat .lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
+  .stat.s1 .num { color: var(--ink); } .stat.s2 .num { color: var(--accent); }
+  .stat.s3 .num { color: var(--accent2); } .stat.s4 .num { color: var(--p-must); }
+
+  .callout { margin-top: 1.4rem; background: rgba(255,255,255,0.72); backdrop-filter: blur(10px); border: 1px solid var(--rule); border-left: 4px solid var(--accent2); border-radius: 12px; padding: 0.95rem 1.2rem; font-size: 0.92rem; }
+  .callout strong { color: var(--accent2); }
+
+  /* ---------- Tab bar ---------- */
+  .tabbar { position: sticky; top: 0; z-index: 60; background: rgba(245,247,253,0.9); backdrop-filter: blur(14px); border-bottom: 1px solid var(--rule); margin-top: 1.8rem; }
+  .tabbar-inner { display: flex; align-items: center; gap: 0.4rem; overflow-x: auto; padding: 0.6rem 0; scrollbar-width: thin; }
+  .tabbtn { flex-shrink: 0; font-family: var(--sans); font-size: 0.88rem; font-weight: 600; color: var(--muted); background: rgba(255,255,255,0.72); border: 1px solid var(--rule); border-radius: 999px; padding: 0.36rem 0.95rem; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
+  .tabbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .tabbtn.active { background: linear-gradient(135deg, var(--accent), #6a5cff); border-color: transparent; color: #fff; }
+  .tabbtn .cnt { font-family: var(--mono); font-size: 0.72rem; opacity: 0.75; margin-left: 0.25rem; }
+  .tabbtn .done-cnt { font-family: var(--mono); font-size: 0.72rem; color: #16a34a; margin-left: 0.15rem; }
+  .tabbtn.active .done-cnt { color: #bbf7d0; }
+
+  .panel { display: none; padding-top: 1.4rem; }
+  .panel.active { display: block; }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; margin-bottom: 0.4rem; }
+  .search { flex: 1 1 220px; min-width: 200px; font-family: var(--sans); font-size: 0.9rem; color: var(--ink); background: rgba(255,255,255,0.85); border: 1px solid var(--rule); border-radius: 10px; padding: 0.5rem 0.85rem; outline: none; }
+  .search:focus { border-color: var(--accent); }
+  .chip { font-family: var(--sans); font-size: 0.8rem; font-weight: 600; color: var(--muted); background: rgba(255,255,255,0.72); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.85rem; cursor: pointer; transition: all 0.15s ease; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.active { background: linear-gradient(135deg, var(--accent), #6a5cff); border-color: transparent; color: #fff; }
+  .chip.expand { color: var(--accent2); border-color: rgba(249,115,22,0.4); }
+  .chip.expand:hover { color: var(--accent2); }
+
+  .progress-line { display: flex; align-items: center; gap: 1rem; margin: 0.6rem 0 0.9rem; }
+  .progress-track { flex: 1; height: 10px; background: var(--rule); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 999px; transition: width 0.3s ease; }
+  .progress-text { font-family: var(--mono); font-size: 0.85rem; font-weight: 700; white-space: nowrap; }
+  .btn-reset { font-family: var(--sans); font-size: 0.8rem; color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 8px; padding: 0.28rem 0.7rem; cursor: pointer; white-space: nowrap; }
+  .btn-reset:hover { color: var(--p-must); border-color: var(--p-must); }
+
+  /* ---------- Chapters & QA ---------- */
+  .chapter { margin-top: 1.6rem; background: rgba(255,255,255,0.72); backdrop-filter: blur(10px); border: 1px solid var(--rule); border-radius: 16px; padding: 1.2rem 1.3rem 0.7rem; box-shadow: 0 4px 24px rgba(61,90,254,0.06); }
+  .chapter-head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; padding-bottom: 0.7rem; border-bottom: 2px solid var(--rule); margin-bottom: 0.3rem; }
+  .chapter-head .no { font-family: var(--mono); font-size: 0.78rem; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--accent), #6a5cff); border-radius: 8px; padding: 0.12rem 0.55rem; }
+  .chapter-head h2 { font-size: 1.12rem; font-weight: 700; flex: 1; }
+  .chapter-head .done { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+
+  .qa { border-bottom: 1px solid var(--rule); padding: 0.55rem 0.3rem; }
+  .qa:last-child { border-bottom: none; }
+  .qa-head { display: flex; align-items: flex-start; gap: 0.7rem; }
+  .qa-head .chk { flex-shrink: 0; cursor: pointer; margin-top: 0.28rem; }
+  .qa-head input[type="checkbox"] { display: none; }
+  .qa-head .box { display: block; width: 1.12rem; height: 1.12rem; border: 2px solid var(--rule); border-radius: 5px; background: #fff; position: relative; transition: all 0.15s ease; }
+  .qa-head .box::after { content: ""; position: absolute; left: 0.27rem; top: 0.02rem; width: 0.28rem; height: 0.6rem; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) scale(0); transition: transform 0.15s ease; }
+  .qa-head input:checked ~ .box { background: linear-gradient(135deg, var(--accent), #6a5cff); border-color: transparent; }
+  .qa-head input:checked ~ .box::after { transform: rotate(45deg) scale(1); }
+  .qa-head .qtext-btn { flex: 1; background: none; border: none; text-align: left; font-family: var(--sans); font-size: 0.95rem; line-height: 1.55; color: var(--ink); cursor: pointer; padding: 0; }
+  .qa-head input:checked ~ .qtext-btn .qtext { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(92,106,138,0.5); }
+  .qa-head .gid { font-family: var(--mono); font-size: 0.73rem; color: var(--muted); margin-right: 0.4rem; }
+  .tag { flex-shrink: 0; font-size: 0.7rem; font-weight: 700; border-radius: 999px; padding: 0.1rem 0.5rem; margin-top: 0.24rem; white-space: nowrap; }
+  .tag.must { color: var(--p-must); background: rgba(225,29,72,0.09); border: 1px solid rgba(225,29,72,0.25); }
+  .tag.high { color: #b45309; background: rgba(245,158,11,0.11); border: 1px solid rgba(245,158,11,0.3); }
+  .tag.core { color: var(--p-core); background: rgba(61,90,254,0.09); border: 1px solid rgba(61,90,254,0.25); }
+  .tag.know { color: var(--p-know); background: rgba(100,116,139,0.1); border: 1px solid rgba(100,116,139,0.28); }
+  .tag.ai { color: #0d9488; background: rgba(13,148,136,0.09); border: 1px solid rgba(13,148,136,0.3); }
+  .twist { flex-shrink: 0; font-family: var(--sans); font-size: 0.74rem; font-weight: 600; color: var(--muted); background: transparent; border: 1px solid var(--rule); border-radius: 7px; padding: 0.18rem 0.55rem; margin-top: 0.2rem; cursor: pointer; white-space: nowrap; }
+  .twist:hover { color: var(--accent); border-color: var(--accent); }
+  .qa.open .twist { color: #fff; background: linear-gradient(135deg, var(--accent), #6a5cff); border-color: transparent; }
+
+  .answer { display: none; margin: 0.65rem 0 0.5rem 1.8rem; padding: 0.9rem 1.1rem; background: rgba(245,247,253,0.85); border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; font-size: 0.9rem; line-height: 1.75; overflow-x: auto; }
+  .qa.open .answer { display: block; }
+  .answer p { margin: 0.4rem 0; }
+  .answer ol, .answer ul { margin: 0.4rem 0 0.4rem 1.4rem; }
+  .answer li { margin: 0.22rem 0; }
+  .answer code { font-family: var(--mono); font-size: 0.82em; background: rgba(61,90,254,0.08); border-radius: 4px; padding: 0.08em 0.35em; }
+  .answer pre { background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 0.75rem 0.9rem; overflow-x: auto; margin: 0.5rem 0; }
+  .answer pre code { background: none; color: inherit; padding: 0; font-size: 0.8rem; }
+  .answer blockquote.doc-callout { border-left: 3px solid var(--accent2); background: rgba(249,115,22,0.06); border-radius: 0 8px 8px 0; padding: 0.5rem 0.9rem; margin: 0.5rem 0; }
+  .answer .ph { display: inline-block; font-size: 0.75rem; color: var(--muted); background: var(--bg); border: 1px dashed var(--rule); border-radius: 6px; padding: 0.1rem 0.5rem; margin: 0.15rem 0; }
+  .answer a { color: var(--accent); }
+  .table-wrap { overflow-x: auto; max-height: 600px; overflow-y: auto; margin: 0.5rem 0; }
+  .answer table { border-collapse: collapse; font-size: 0.85rem; min-width: 420px; }
+  .answer th, .answer td { border: 1px solid var(--rule); padding: 0.35rem 0.6rem; text-align: left; }
+  .answer th { background: rgba(61,90,254,0.07); }
+  .answer hr { border: none; border-top: 1px solid var(--rule); margin: 0.6rem 0; }
+  .no-answer { color: var(--muted); font-size: 0.85rem; }
+  .no-answer strong { color: var(--accent2); }
+
+  .qa.hidden-filter { display: none; }
+  .chapter.hidden-chapter { display: none; }
+
+  /* ---------- Overview ---------- */
+  .chart-figure { margin: 0.6rem 0 0.4rem; background: rgba(255,255,255,0.72); backdrop-filter: blur(10px); border: 1px solid var(--rule); border-radius: 14px; padding: 1.2rem 1.2rem 0.7rem; }
+  .chart-figure figcaption { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .chart-figure .chart-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.6rem; }
+
+  .linkgroup { margin-top: 1.4rem; }
+  .linkgroup h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
+  .linkgroup h3 .badge { font-family: var(--mono); font-size: 0.72rem; font-weight: 700; color: var(--muted); background: var(--bg); border: 1px solid var(--rule); border-radius: 999px; padding: 0.05rem 0.55rem; }
+  .linkgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0.7rem; }
+  .linkcard { background: rgba(255,255,255,0.72); backdrop-filter: blur(10px); border: 1px solid var(--rule); border-radius: 12px; padding: 0.75rem 0.95rem; display: flex; align-items: center; gap: 0.7rem; transition: all 0.15s ease; }
+  .linkcard:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(61,90,254,0.1); }
+  .linkcard .ic { flex-shrink: 0; width: 2.2rem; height: 2.2rem; border-radius: 8px; background: linear-gradient(135deg, rgba(61,90,254,0.12), rgba(249,115,22,0.1)); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+  .linkcard .meta { flex: 1; min-width: 0; }
+  .linkcard .t { font-size: 0.9rem; font-weight: 600; color: var(--ink); text-decoration: none; display: block; }
+  .linkcard .t:hover { color: var(--accent); }
+  .linkcard .d { font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem; }
+  .st { flex-shrink: 0; font-size: 0.7rem; font-weight: 700; border-radius: 999px; padding: 0.14rem 0.55rem; white-space: nowrap; }
+  .st.full { color: #0d9488; background: rgba(13,148,136,0.09); border: 1px solid rgba(13,148,136,0.3); }
+  .st.mine { color: #7c3aed; background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.3); }
+  .st.list { color: var(--p-core); background: rgba(61,90,254,0.08); border: 1px solid rgba(61,90,254,0.25); }
+  .st.denied { color: var(--p-must); background: rgba(225,29,72,0.07); border: 1px solid rgba(225,29,72,0.25); }
+
+  footer { margin-top: 3rem; border-top: 1px solid var(--rule); padding-top: 1.5rem; font-size: 0.85rem; color: var(--muted); }
+  footer .sources h2 { font-size: 1rem; color: var(--ink); margin-bottom: 0.5rem; }
+  footer .sources ol { padding-left: 1.2rem; }
+  footer .sources li { margin-bottom: 0.5rem; overflow-wrap: break-word; }
+  footer .sources .src-title { color: var(--ink); }
+  footer .sources a { color: var(--accent); word-break: break-all; }
+
+  @media (max-width: 720px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .chapter { padding: 1rem 0.9rem 0.5rem; }
+    .answer { margin-left: 0.6rem; }
+    .qa-head .gid { display: none; }
+  }
+
+  @media print {
+    .tabbar, .toolbar, .progress-line, .btn-reset, .twist { display: none !important; }
+    .panel { display: block !important; }
+    .answer { display: block !important; }
+    body { background: #fff; }
+    .chapter, .stat, .callout, .chart-figure, .linkcard { background: #fff; box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Interview Speedrun Collection</div>
+    <h1>面试速通<em>全清单</em></h1>
+    <p class="sub">
+      汇总「速通系列」34 份飞书文档 + 3 份本地笔记：11 个核心 Tab（1479 题全部含完整答案）、20 份技术文档题目清单（1634 题）、4 份无权限链接。
+      支持勾选打卡（自动保存）、按优先级筛选、关键词搜索、答案展开收起；总览卡片点击即可进入对应 Tab。
+    </p>
+    <div class="stats">
+      <div class="stat s1"><div class="num" id="statDocs">37</div><div class="lbl">文档总数</div></div>
+      <div class="stat s2"><div class="num" id="statQs">0</div><div class="lbl">题目总数</div></div>
+      <div class="stat s3"><div class="num" id="statAns">0</div><div class="lbl">含完整答案</div></div>
+      <div class="stat s4"><div class="num" id="statTabs">11</div><div class="lbl">核心 Tab</div></div>
+    </div>
+    <div class="callout">
+      标签说明：<strong>面试必考 / 高频 / 必须掌握 / 了解即可</strong> 来自原文档标注；<strong>AI 补充</strong> 表示原文档未提供独立答案、由 AI 补写的完整回答。
+      答案中 <strong>[原文档此处有配图]</strong> 表示原位置为截图，请查阅原文链接。
+    </div>
+  </header>
+
+  <nav class="tabbar"><div class="wrap tabbar-inner" id="tabbar"></div></nav>
+
+  <section class="panel" id="panel-overview">
+    <figure class="chart-figure">
+      <figcaption>各文档题量分布</figcaption>
+      <div class="chart-sub">含完整答案的文档以主色展示，题目清单类文档以浅色展示</div>
+      <div id="chart-docs" style="width:100%;min-height:560px"></div>
+    </figure>
+    <div id="linkgroups"></div>
+  </section>
+
+  <section class="panel" id="panel-mine"></section>
+  <section class="panel" id="panel-route"></section>
+  <section class="panel" id="panel-java"></section>
+  <section class="panel" id="panel-agent"></section>
+  <section class="panel" id="panel-redis"></section>
+  <section class="panel" id="panel-mysql"></section>
+  <section class="panel" id="panel-llm"></section>
+  <section class="panel" id="panel-rag"></section>
+  <section class="panel" id="panel-concurrent"></section>
+  <section class="panel" id="panel-mq"></section>
+  <section class="panel" id="panel-net"></section>
+  <section class="panel" id="panel-others"></section>
+
+  <footer>
+    <div class="sources">
+      <h2>来源</h2>
+      <ol>
+        <li><span class="src-title">飞书文档：4小时速通Agent 面试（文档系列导航页，含全部 36 个文档链接）</span><br>
+          <a href="https://utxc8uqzfk.feishu.cn/wiki/MyrjwtWSNimJ5IkDUPkcGRLfnRa" target="_blank" rel="noopener">https://utxc8uqzfk.feishu.cn/wiki/MyrjwtWSNimJ5IkDUPkcGRLfnRa</a></li>
+        <li><span class="src-title">飞书文档：2小时速通Java（更新ing，先看重点，二八法则！）</span><br>
+          <a href="https://utxc8uqzfk.feishu.cn/wiki/MWlXwd9F1i08xOkYrAhcDDdhn9c" target="_blank" rel="noopener">https://utxc8uqzfk.feishu.cn/wiki/MWlXwd9F1i08xOkYrAhcDDdhn9c</a></li>
+      </ol>
+    </div>
+  </footer>
+</div>
+
+<!-- REQUIRED: ECharts -->
+<script src="./_shared/js/echarts.min.js"></script>
+<script src="assets/data-links.js"></script>
+<script src="assets/data-mine.js"></script>
+<script src="assets/data-route.js"></script>
+<script src="assets/data-java.js"></script>
+<script src="assets/data-agent.js"></script>
+<script src="assets/data-redis.js"></script>
+<script src="assets/data-mysql.js"></script>
+<script src="assets/data-llm.js"></script>
+<script src="assets/data-rag.js"></script>
+<script src="assets/data-concurrent.js"></script>
+<script src="assets/data-mq.js"></script>
+<script src="assets/data-net.js"></script>
+<script src="assets/data-others.js"></script>
+<script src="assets/data-patch.js"></script>
+<script src="assets/data-patch2.js"></script>
+<script src="assets/data-patch3.js"></script>
+<script src="assets/data-patch4.js"></script>
+<script src="assets/checklist.js"></script>
+<script src="assets/charts.js"></script>
+</body>
+</html>
