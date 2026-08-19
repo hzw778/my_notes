@@ -15,7 +15,19 @@
     concurrent: "并发编程",
     mq: "消息队列",
     net: "计算机网络",
-    others: "清单库"
+    docker: "Docker",
+    claudecode: "ClaudeCode",
+    es: "ElasticSearch",
+    rpc: "RPC",
+    kafka: "Kafka",
+    pg: "PostgreSQL",
+    langgraph: "LangGraph",
+    go: "Go语言",
+    design: "设计模式",
+    distributed: "分布式",
+    redisstream: "Redis Stream",
+    linux: "Linux",
+    python: "Python"
   };
   var PRI_LABEL = { must: "面试必考", high: "高频", core: "必须掌握", know: "了解即可" };
   var PRI_ORDER = ["must", "high", "core", "know"];
@@ -25,6 +37,7 @@
   var DATA = window.TAB_DATA || {};
   var PATCH = window.TAB_PATCH || {};
   var OTHERS = (window.OTHERS || []).filter(function (d) { return !SKIP_OTHERS_KEYS[d.key]; });
+  var OTHER_KEYS = OTHERS.map(function (d) { return d.key; });
   var LINKS = window.LINKS || { groups: [] };
   var ICONS = {};
   LINKS.groups.forEach(function (g) { g.items.forEach(function (it) { if (it.key) ICONS[it.key] = it.icon; }); });
@@ -48,25 +61,46 @@
     if (hasAns(h)) return { html: h, ai: true };
     return null;
   }
+  function otherDocAns(d, q) {
+    if (q.s != null && window.OTHERS_SHARED && hasAns(window.OTHERS_SHARED[q.s])) return window.OTHERS_SHARED[q.s];
+    return "";
+  }
+  function otherResolve(d, q) {
+    if (otherDocAns(d, q)) return { html: otherDocAns(d, q), ai: false };
+    var h = (window.OTHERS_AI || {})[d.key + q.t];
+    if (hasAns(h)) return { html: h, ai: true };
+    return null;
+  }
 
   var state = { tab: "overview", filter: {}, query: {} };
   var docStats = [];
 
+  /* ---------- Panels (core static, others dynamic) ---------- */
+  function buildPanels() {
+    var wrap = document.querySelector(".wrap");
+    if (!wrap) return;
+    OTHERS.forEach(function (d) {
+      if (document.getElementById("panel-" + d.key)) return;
+      var sec = document.createElement("section");
+      sec.className = "panel";
+      sec.id = "panel-" + d.key;
+      wrap.appendChild(sec);
+    });
+  }
+
+  function qCount(doc) { var n = 0; doc.chapters.forEach(function (c) { n += c.questions.length; }); return n; }
+
   /* ---------- Tab bar ---------- */
   function buildTabbar() {
     var bar = document.getElementById("tabbar");
+    var all = ["overview"].concat(TAB_ORDER).concat(OTHER_KEYS);
     var html = "";
-    var tabs = ["overview"].concat(TAB_ORDER).concat(["others"]);
-    tabs.forEach(function (k) {
-      var cnt = "";
-      if (DATA[k]) {
-        var n = 0; DATA[k].chapters.forEach(function (c) { n += c.questions.length; });
-        cnt = '<span class="cnt">' + n + '</span><span class="done-cnt" data-done="' + k + '"></span>';
-      } else if (k === "others") {
-        var n2 = 0; OTHERS.forEach(function (d) { d.chapters.forEach(function (c) { n2 += c.questions.length; }); });
-        cnt = '<span class="cnt">' + n2 + '</span><span class="done-cnt" data-done="others"></span>';
-      }
-      html += '<button class="tabbtn" data-tab="' + k + '">' + TAB_SHORT[k] + cnt + "</button>";
+    all.forEach(function (k) {
+      var n = 0;
+      if (DATA[k]) n = qCount(DATA[k]);
+      else if (k !== "overview") { var d = OTHERS.filter(function (x) { return x.key === k; })[0]; if (d) n = qCount(d); }
+      html += '<button class="tabbtn" data-tab="' + k + '">' + TAB_SHORT[k] +
+        (n ? '<span class="cnt">' + n + '</span><span class="done-cnt" data-done="' + k + '"></span>' : "") + "</button>";
     });
     bar.innerHTML = html;
     bar.addEventListener("click", function (e) {
@@ -98,9 +132,9 @@
       fullQ += n; fullA += a;
       docStats.push({ name: DATA[k].title.replace(/（更新ing[^）]*）/, "").replace(/^(\d+小时|\d+分钟|一周)/, "").replace("速通", "速通·"), raw: DATA[k].title, count: n, answered: a, status: "full", key: k });
     });
+    var AIo = window.OTHERS_AI || {};
     OTHERS.forEach(function (d) {
       var n = 0, a = 0;
-      var AIo = window.OTHERS_AI || {};
       d.chapters.forEach(function (c) {
         c.questions.forEach(function (q) { n++; if (otherDocAns(d, q) || AIo[d.key + q.t]) a++; });
       });
@@ -108,11 +142,17 @@
       docStats.push({ name: d.title.replace(/（更新ing[^）]*）/, ""), raw: d.title, count: n, answered: a, status: "list", key: d.key });
     });
 
+    var statDocs = document.getElementById("statDocs");
     var statQs = document.getElementById("statQs");
     var statAns = document.getElementById("statAns");
+    var statTabs = document.getElementById("statTabs");
     var listA = docStats.filter(function (s) { return s.status === "list"; }).reduce(function (s2, x) { return s2 + x.answered; }, 0);
+    var totalDocs = 0;
+    LINKS.groups.forEach(function (g) { totalDocs += g.items.length; });
+    if (statDocs) statDocs.textContent = totalDocs;
     if (statQs) statQs.textContent = (fullQ + listQ).toLocaleString();
     if (statAns) statAns.textContent = (fullA + listA).toLocaleString();
+    if (statTabs) statTabs.textContent = TAB_ORDER.length + OTHER_KEYS.length;
 
     var lg = document.getElementById("linkgroups");
     var html = "";
@@ -129,14 +169,14 @@
             desc = st ? st.count + " 题 · 全部含答案" : "含完整答案";
           } else if (it.status === "list") {
             var st2 = docStats.filter(function (s) { return s.key === it.key; })[0];
-            desc = st2 ? st2.count + " 题 · 含完整答案（清单库）" : "含完整答案";
+            desc = st2 ? st2.count + " 题 · 含完整答案" : "含完整答案";
           }
         }
         var stTxt = it.status === "full" ? "全文+答案" : it.status === "list" ? "全文+答案" : it.status === "mine" ? "已收录" : "无权限";
         var goto = null;
         if (it.status === "mine") goto = "mine";
         else if (it.key && DATA[it.key]) goto = it.key;
-        else if (it.status === "list") goto = "others";
+        else if (it.status === "list") goto = it.key;
         if (goto) desc += " · 点击进入";
         html += '<a class="linkcard" href="' + url + '"' + (goto ? ' data-goto="' + goto + '"' : ' target="_blank" rel="noopener"') + ">" +
           '<span class="ic">' + (it.icon || "📄") + "</span>" +
@@ -156,7 +196,32 @@
     });
   }
 
-  /* ---------- Tech tab (with answers) ---------- */
+  /* ---------- Shared toolbar HTML ---------- */
+  function toolbarHtml(key, pris) {
+    var chips = '<button class="chip fchip active" data-f="all">全部</button>';
+    PRI_ORDER.forEach(function (p) {
+      if (pris[p]) chips += '<button class="chip fchip" data-f="' + p + '">' + PRI_LABEL[p] + "</button>";
+    });
+    if (state.filter[key] === undefined) state.filter[key] = "all";
+    if (state.query[key] === undefined) state.query[key] = "";
+    return '<div class="toolbar">' +
+      '<input class="search" type="search" placeholder="搜索本 Tab 题目关键词…" data-search="' + key + '" value="' + esc(state.query[key]) + '">' +
+      chips +
+      '<button class="chip fchip" data-f="undone">未做</button>' +
+      '<button class="chip fchip" data-f="done">已做</button>' +
+      '<button class="chip expand" data-expand="' + key + '">展开全部答案</button>' +
+      "</div>";
+  }
+
+  function progressHtml(key, total) {
+    return '<div class="progress-line">' +
+      '<div class="progress-track"><div class="progress-fill" id="fill-' + key + '"></div></div>' +
+      '<span class="progress-text" id="ptext-' + key + '">0 / ' + total + "</span>" +
+      '<button class="btn-reset" data-reset="' + key + '">重置本Tab进度</button>' +
+      "</div>";
+  }
+
+  /* ---------- Tech tab (core, with answers) ---------- */
   function renderTechTab(key) {
     var panel = document.getElementById("panel-" + key);
     var d = DATA[key];
@@ -164,26 +229,7 @@
     var total = 0;
     d.chapters.forEach(function (c) { c.questions.forEach(function (q) { pris[q.p] = 1; total++; }); });
 
-    var chips = '<button class="chip fchip active" data-f="all">全部</button>';
-    PRI_ORDER.forEach(function (p) {
-      if (pris[p]) chips += '<button class="chip fchip" data-f="' + p + '">' + PRI_LABEL[p] + "</button>";
-    });
-    if (state.filter[key] === undefined) state.filter[key] = "all";
-    if (state.query[key] === undefined) state.query[key] = "";
-
-    var html =
-      '<div class="toolbar">' +
-      '<input class="search" type="search" placeholder="搜索本 Tab 题目关键词…" data-search="' + key + '" value="' + esc(state.query[key]) + '">' +
-      chips +
-      '<button class="chip fchip" data-f="undone">未做</button>' +
-      '<button class="chip fchip" data-f="done">已做</button>' +
-      '<button class="chip expand" data-expand="' + key + '">展开全部答案</button>' +
-      "</div>" +
-      '<div class="progress-line">' +
-      '<div class="progress-track"><div class="progress-fill" id="fill-' + key + '"></div></div>' +
-      '<span class="progress-text" id="ptext-' + key + '">0 / ' + total + "</span>" +
-      '<button class="btn-reset" data-reset="' + key + '">重置本Tab进度</button>' +
-      "</div>" +
+    var html = toolbarHtml(key, pris) + progressHtml(key, total) +
       '<p style="font-size:.82rem;color:var(--muted);margin:.2rem 0 .2rem">来源：' +
       (d.url ? '<a href="' + d.url + '" target="_blank" rel="noopener" style="color:var(--accent)">' + esc(d.title) + " ↗</a>"
              : "<strong>" + esc(d.title) + "</strong>（本地 Markdown 笔记解析）") + "</p>";
@@ -215,57 +261,39 @@
     panel.innerHTML = html;
   }
 
-  /* ---------- Others tab (with answers from doc or AI) ---------- */
-  function otherDocAns(d, q) {
-    if (q.s != null && window.OTHERS_SHARED && hasAns(window.OTHERS_SHARED[q.s])) return window.OTHERS_SHARED[q.s];
-    return "";
-  }
+  /* ---------- Other doc tab (each ext doc = one tab) ---------- */
+  function renderOtherTab(d) {
+    var key = d.key;
+    var panel = document.getElementById("panel-" + key);
+    if (!panel) return;
+    var pris = {};
+    var total = 0;
+    d.chapters.forEach(function (c) { c.questions.forEach(function (q) { pris[q.p] = 1; total++; }); });
 
-  function renderOthers() {
-    var panel = document.getElementById("panel-others");
-    var AI = window.OTHERS_AI || {};
-    var docAns = 0, aiAns = 0, noAns = 0;
-    OTHERS.forEach(function (d) {
-      d.chapters.forEach(function (c) {
-        c.questions.forEach(function (q) {
-          var ai = AI[d.key + q.t];
-          if (otherDocAns(d, q)) docAns++;
-          else if (ai) aiAns++;
-          else noAns++;
-        });
-      });
-    });
-    var html =
-      '<div class="callout" style="margin-top:.6rem">' + OTHERS.length + ' 份扩展技术文档共 <strong>' + (docAns + aiAns + noAns) + ' 题</strong>：' +
-      '<strong>' + docAns + '</strong> 题含飞书原文答案、<strong>' + aiAns + '</strong> 题为 AI 补写答案' +
-      (noAns ? '、' + noAns + ' 题暂缺' : '') + '。</div>';
-    OTHERS.forEach(function (d, di) {
-      var n = 0; d.chapters.forEach(function (c) { n += c.questions.length; });
-      html += '<section class="chapter" style="margin-top:1.2rem">' +
-        '<div class="chapter-head"><span class="no">' + (ICONS[d.key] || "📄") + "</span><h2>" +
-        '<a href="' + d.url + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">' + esc(d.title) + " ↗</a></h2>" +
-        '<span class="done" data-chdone>0 / ' + n + "</span></div>";
-      var gid = 0;
-      d.chapters.forEach(function (c) {
-        html += '<p style="font-size:.85rem;font-weight:700;color:var(--muted);margin:.7rem 0 .2rem">' + esc(c.title) + "</p>";
-        c.questions.forEach(function (q) {
-          gid++;
-          var id = "others:" + di + ":" + gid;
-          var tagCls = q.p || "know";
-          var tagTxt = q.tag || PRI_LABEL[q.p] || "";
-          var ai = !otherDocAns(d, q) ? AI[d.key + q.t] : null;
-          var ansHtml = otherDocAns(d, q) || ai;
-          html += '<div class="qa" data-gid="' + id + '" data-pri="' + (q.p || "") + '" data-text="' + esc(q.t.toLowerCase()) + '">' +
-            '<div class="qa-head">' +
-            '<label class="chk"><input type="checkbox" data-id="' + id + '"' + (progress[id] ? " checked" : "") + '><span class="box"></span></label>' +
-            '<button class="qtext-btn" data-twist style="flex:1;font-size:.92rem;line-height:1.55;text-align:left;background:none;border:none;cursor:pointer;color:inherit;padding:0;font-family:inherit"><span class="gid">#' + String(gid).padStart(3, "0") + '</span><span class="qtext">' + esc(q.t) + "</span></button>";
-          if (tagTxt) html += '<span class="tag ' + tagCls + '">' + esc(tagTxt) + "</span>";
-          if (ai) html += '<span class="tag ai" title="原文档未提供答案，由 AI 补写">AI补充</span>';
-          if (ansHtml) html += '<button class="twist" data-twist>答案</button>';
-          html += "</div>";
-          if (ansHtml) html += '<div class="answer">' + ansHtml + "</div>";
-          html += "</div>";
-        });
+    var html = toolbarHtml(key, pris) + progressHtml(key, total) +
+      '<p style="font-size:.82rem;color:var(--muted);margin:.2rem 0 .2rem">来源：' +
+      '<a href="' + d.url + '" target="_blank" rel="noopener" style="color:var(--accent)">' + esc(d.title) + " ↗</a></p>";
+
+    var gid = 0;
+    d.chapters.forEach(function (c) {
+      html += '<section class="chapter">';
+      html += '<div class="chapter-head"><span class="no">' + (ICONS[d.key] || "📄") + "</span><h2>" + esc(c.title) + '</h2><span class="done" data-chdone></span></div>';
+      c.questions.forEach(function (q) {
+        gid++;
+        var id = key + ":" + gid;
+        var ans = otherResolve(d, q);
+        var tagCls = q.p || "know";
+        var tagTxt = q.tag || PRI_LABEL[q.p] || "";
+        html += '<div class="qa" data-gid="' + id + '" data-pri="' + (q.p || "") + '" data-text="' + esc(q.t.toLowerCase()) + '">' +
+          '<div class="qa-head">' +
+          '<label class="chk"><input type="checkbox" data-id="' + id + '"' + (progress[id] ? " checked" : "") + '><span class="box"></span></label>' +
+          '<button class="qtext-btn" data-twist><span class="gid">#' + String(gid).padStart(3, "0") + '</span><span class="qtext">' + esc(q.t) + "</span></button>";
+        if (tagTxt) html += '<span class="tag ' + tagCls + '">' + esc(tagTxt) + "</span>";
+        if (ans && ans.ai) html += '<span class="tag ai" title="原文档未提供答案，由 AI 补写">AI补充</span>';
+        if (ans) html += '<button class="twist" data-twist>答案</button>';
+        html += "</div>";
+        if (ans) html += '<div class="answer">' + ans.html + "</div>";
+        html += "</div>";
       });
       html += "</section>";
     });
@@ -279,7 +307,7 @@
     var panel = document.getElementById("panel-" + key);
     if (!panel) return;
     var qs = panel.querySelectorAll(".qa");
-    var done = 0, visible = 0;
+    var done = 0;
     var f = state.filter[key] || "all";
     var kw = (state.query[key] || "").trim().toLowerCase();
     qs.forEach(function (el) {
@@ -295,7 +323,6 @@
       }
       if (show && kw) show = text.indexOf(kw) >= 0;
       el.classList.toggle("hidden-filter", !show);
-      if (show) visible++;
       if (box.checked) done++;
     });
     panel.querySelectorAll(".chapter").forEach(function (sec) {
@@ -323,7 +350,7 @@
 
   function refreshAll() {
     TAB_ORDER.forEach(refreshTab);
-    refreshTab("others");
+    OTHER_KEYS.forEach(refreshTab);
   }
 
   /* ---------- Global events ---------- */
@@ -333,10 +360,8 @@
       var id = box.getAttribute("data-id");
       if (box.checked) progress[id] = 1; else delete progress[id];
       save();
-      var qa = box.closest(".qa");
-      var panel = qa.closest(".panel");
-      var key = panel.id.replace("panel-", "");
-      refreshTab(key === "others" ? "others" : key);
+      var key = box.closest(".panel").id.replace("panel-", "");
+      refreshTab(key);
     }
   });
 
@@ -345,7 +370,6 @@
     var twist = t.closest("[data-twist]");
     if (twist) {
       var qa = twist.closest(".qa");
-      if (twist.hasAttribute("data-expand")) return;
       var open = qa.classList.toggle("open");
       if (twist.classList.contains("qtext-btn")) {
         var btn = qa.querySelector(".twist");
@@ -397,12 +421,13 @@
   });
 
   /* ---------- Init ---------- */
+  buildPanels();
   buildTabbar();
   renderOverview();
   TAB_ORDER.forEach(renderTechTab);
-  renderOthers();
+  OTHERS.forEach(renderOtherTab);
   refreshAll();
   switchTab("overview");
 
-  window.APP_STATE = { docStats: docStats, tabs: TAB_ORDER };
+  window.APP_STATE = { docStats: docStats, tabs: TAB_ORDER.concat(OTHER_KEYS) };
 })();

@@ -39,7 +39,9 @@ window.LINKS = {
         { key: "go", icon: "🐹", title: "2小时速通Go语言", token: "Bx2HwcEK3ij8rikyrRocW9XonRe", status: "list" },
         { key: "design", icon: "🏗️", title: "1小时速通设计模式", token: "IQVVwnIFNiIue3kfoDEczdCYnPf", status: "list" },
         { key: "distributed", icon: "🌍", title: "2小时速通分布式", token: "ThHRw6T1zixIVhk1npLcL2v0n9c", status: "list" },
-        { key: "redisstream", icon: "📭", title: "1小时速通Redis Stream", token: "FBDbwmnr1iIbG5kTVi4cmSBhn7f", status: "list" }
+        { key: "redisstream", icon: "📭", title: "1小时速通Redis Stream", token: "FBDbwmnr1iYbG5kTVi4cmSBhn7f", status: "list" },
+        { key: "linux", icon: "🐧", title: "1小时速通Linux", token: "HKalwjkOwiahK8kvyGJcJHh7nef", status: "list" },
+        { key: "python", icon: "🐍", title: "2小时速通Python+FastAPI", token: "XNTRwx7TVim6uqk064Vcb67jnrX", status: "list" }
       ]
     }
   ],
