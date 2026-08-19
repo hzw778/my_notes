@@ -51,6 +51,12 @@
     });
   }
   function norm(s) { return String(s).trim().replace(/[?？。.\s]+$/g, ""); }
+  function cleanTitle(t) {
+    return String(t)
+      .replace(/^\d+(\.\d+)?\s*(小时|分钟|周|天)\s*速通/, "")
+      .replace(/（更新ing[^）]*）/g, "")
+      .trim();
+  }
   function hasAns(h) {
     return !!(h && h.replace(/<[^>]+>/g, "").replace(/\s/g, "").replace(/[\[\]原文档此处有配图]/g, "").length > 0);
   }
@@ -180,7 +186,7 @@
         if (goto) desc += " · 点击进入";
         html += '<a class="linkcard" href="' + url + '"' + (goto ? ' data-goto="' + goto + '"' : ' target="_blank" rel="noopener"') + ">" +
           '<span class="ic">' + (it.icon || "📄") + "</span>" +
-          '<span class="meta"><span class="t">' + esc(it.title) + "</span>" +
+          '<span class="meta"><span class="t">' + esc(cleanTitle(it.title)) + "</span>" +
           (desc ? '<span class="d">' + desc + "</span>" : "") + "</span>" +
           '<span class="st ' + it.status + '">' + stTxt + "</span></a>";
       });
