@@ -43,6 +43,26 @@ window.LINKS = {
         { key: "linux", icon: "🐧", title: "1小时速通Linux", token: "HKalwjkOwiahK8kvyGJcJHh7nef", status: "list" },
         { key: "python", icon: "🐍", title: "2小时速通Python+FastAPI", token: "XNTRwx7TVim6uqk064Vcb67jnrX", status: "list" }
       ]
+    },
+    {
+      name: "面渣逆袭",
+      note: "PDF 原文，点击在新标签页直接阅读完整内容（含全部配图）",
+      items: [
+        { icon: "☕", title: "Java 基础篇", pdf: "面渣逆袭+进阶之路/面渣逆袭Java基础篇V2.1.pdf", size: "11.8 MB" },
+        { icon: "📦", title: "集合框架篇", pdf: "面渣逆袭+进阶之路/面渣逆袭集合框架篇V2.1.pdf", size: "13.1 MB" },
+        { icon: "⚙️", title: "JVM 篇", pdf: "面渣逆袭+进阶之路/面渣逆袭 JVM篇 V2.1.pdf", size: "16.0 MB" },
+        { icon: "🧵", title: "并发编程篇", pdf: "面渣逆袭+进阶之路/面渣逆袭并发编程篇V2.1.pdf", size: "23.1 MB" },
+        { icon: "🐬", title: "MySQL 篇", pdf: "面渣逆袭+进阶之路/面渣逆袭MySQL篇V2.2.pdf", size: "53.6 MB" },
+        { icon: "🟥", title: "Redis 篇", pdf: "面渣逆袭+进阶之路/面渣逆袭Redis篇V2.0.pdf", size: "68.5 MB" },
+        { icon: "🍃", title: "Spring 篇", pdf: "面渣逆袭+进阶之路/面渣逆袭Spring篇V2.0亮白版.pdf", size: "47.7 MB" },
+        { icon: "🐘", title: "MyBatis", pdf: "面渣逆袭+进阶之路/面渣逆袭 MyBatis.pdf", size: "3.2 MB" },
+        { icon: "🚀", title: "RocketMQ 篇", pdf: "面渣逆袭+进阶之路/面渣逆袭RocketMQ篇.pdf", size: "5.0 MB" },
+        { icon: "🌍", title: "分布式篇", pdf: "面渣逆袭+进阶之路/面渣逆袭-分布式篇.pdf", size: "1.9 MB" },
+        { icon: "🧩", title: "微服务篇", pdf: "面渣逆袭+进阶之路/面渣逆袭微服务篇.pdf", size: "3.1 MB" },
+        { icon: "🖥️", title: "操作系统", pdf: "面渣逆袭+进阶之路/面渣逆袭操作系统.pdf", size: "3.3 MB" },
+        { icon: "🌐", title: "计算机网络", pdf: "面渣逆袭+进阶之路/面渣逆袭计算机网络.pdf", size: "7.9 MB" },
+        { icon: "📚", title: "Java 进阶之路", pdf: "面渣逆袭+进阶之路/二哥的 Java 进阶之路亮白版.pdf", size: "34.5 MB" }
+      ]
     }
   ],
   url: function (token) { return "https://utxc8uqzfk.feishu.cn/wiki/" + token; }

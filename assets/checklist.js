@@ -167,8 +167,10 @@
       if (g.note) html += '<p style="font-size:.82rem;color:var(--muted);margin:-0.3rem 0 .6rem">' + esc(g.note) + "</p>";
       html += '<div class="linkgrid">';
       g.items.forEach(function (it) {
-        var url = it.local ? "#" : "https://utxc8uqzfk.feishu.cn/wiki/" + it.token;
+        var isPdf = !!it.pdf;
+        var url = isPdf ? encodeURI(it.pdf) : (it.local ? "#" : "https://utxc8uqzfk.feishu.cn/wiki/" + it.token);
         var desc = it.note ? esc(it.note) : "";
+        if (!desc && isPdf) desc = (it.size || "") + (it.size ? " · " : "") + "PDF 原文阅读";
         if (!desc) {
           if (it.status === "full") {
             var st = docStats.filter(function (s) { return s.key === it.key; })[0];
@@ -178,17 +180,19 @@
             desc = st2 ? st2.count + " 题 · 含完整答案" : "含完整答案";
           }
         }
-        var stTxt = it.status === "full" ? "全文+答案" : it.status === "list" ? "全文+答案" : it.status === "mine" ? "已收录" : "无权限";
+        var stTxt = isPdf ? "PDF" : (it.status === "full" ? "全文+答案" : it.status === "list" ? "全文+答案" : it.status === "mine" ? "已收录" : "无权限");
         var goto = null;
-        if (it.status === "mine") goto = "mine";
-        else if (it.key && DATA[it.key]) goto = it.key;
-        else if (it.status === "list") goto = it.key;
+        if (!isPdf) {
+          if (it.status === "mine") goto = "mine";
+          else if (it.key && DATA[it.key]) goto = it.key;
+          else if (it.status === "list") goto = it.key;
+        }
         if (goto) desc += " · 点击进入";
         html += '<a class="linkcard" href="' + url + '"' + (goto ? ' data-goto="' + goto + '"' : ' target="_blank" rel="noopener"') + ">" +
           '<span class="ic">' + (it.icon || "📄") + "</span>" +
           '<span class="meta"><span class="t">' + esc(cleanTitle(it.title)) + "</span>" +
           (desc ? '<span class="d">' + desc + "</span>" : "") + "</span>" +
-          '<span class="st ' + it.status + '">' + stTxt + "</span></a>";
+          '<span class="st ' + (isPdf ? "pdf" : it.status) + '">' + stTxt + "</span></a>";
       });
       html += "</div></div>";
     });
