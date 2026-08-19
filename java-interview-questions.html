@@ -173,6 +173,15 @@
     body { background: #fff; }
     .chapter, .stat, .callout, .chart-figure, .linkcard { background: #fff; box-shadow: none; break-inside: avoid; }
   }
+
+  /* ---------- PDF modal ---------- */
+  .pdf-modal { position: fixed; inset: 0; z-index: 200; background: rgba(15,23,42,0.82); display: none; flex-direction: column; }
+  .pdf-modal.open { display: flex; }
+  .pdf-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.8rem 1.2rem; background: #0f172a; color: #fff; flex-shrink: 0; }
+  .pdf-modal-head span { font-size: 0.95rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pdf-close { flex-shrink: 0; font-family: var(--sans); font-size: 0.85rem; font-weight: 600; color: #fff; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 0.35rem 1rem; cursor: pointer; }
+  .pdf-close:hover { background: rgba(255,255,255,0.2); }
+  .pdf-modal iframe { flex: 1; width: 100%; border: none; background: #525659; }
 </style>
 </head>
 <body>
@@ -206,6 +215,14 @@
   <section class="panel" id="panel-concurrent"></section>
   <section class="panel" id="panel-mq"></section>
   <section class="panel" id="panel-net"></section>
+</div>
+
+<div id="pdf-modal" class="pdf-modal">
+  <div class="pdf-modal-head">
+    <span id="pdf-modal-title"></span>
+    <button id="pdf-modal-close" class="pdf-close">关闭</button>
+  </div>
+  <iframe id="pdf-frame" title="PDF 阅读器"></iframe>
 </div>
 
 <script src="assets/data-links.js"></script>

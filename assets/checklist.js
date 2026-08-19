@@ -188,7 +188,11 @@
           else if (it.status === "list") goto = it.key;
         }
         if (goto) desc += " · 点击进入";
-        html += '<a class="linkcard" href="' + url + '"' + (goto ? ' data-goto="' + goto + '"' : ' target="_blank" rel="noopener"') + ">" +
+        var attrs = 'href="' + url + '"';
+        if (isPdf) attrs += ' data-pdf="' + esc(url) + '" data-pdf-title="' + esc(cleanTitle(it.title)) + '"';
+        else if (goto) attrs += ' data-goto="' + goto + '"';
+        else attrs += ' target="_blank" rel="noopener"';
+        html += '<a class="linkcard" ' + attrs + ">" +
           '<span class="ic">' + (it.icon || "📄") + "</span>" +
           '<span class="meta"><span class="t">' + esc(cleanTitle(it.title)) + "</span>" +
           (desc ? '<span class="d">' + desc + "</span>" : "") + "</span>" +
@@ -198,6 +202,12 @@
     });
     lg.innerHTML = html;
     lg.addEventListener("click", function (e) {
+      var pdfCard = e.target.closest(".linkcard[data-pdf]");
+      if (pdfCard) {
+        e.preventDefault();
+        openPdf(pdfCard.getAttribute("data-pdf"), pdfCard.getAttribute("data-pdf-title"));
+        return;
+      }
       var card = e.target.closest(".linkcard[data-goto]");
       if (!card) return;
       e.preventDefault();
@@ -429,6 +439,33 @@
       refreshTab(key);
     }
   });
+
+  /* ---------- PDF modal ---------- */
+  function openPdf(src, title) {
+    var modal = document.getElementById("pdf-modal");
+    var frame = document.getElementById("pdf-frame");
+    var t = document.getElementById("pdf-modal-title");
+    if (!modal || !frame) return;
+    if (t) t.textContent = title || "PDF 预览";
+    frame.src = src;
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closePdf() {
+    var modal = document.getElementById("pdf-modal");
+    var frame = document.getElementById("pdf-frame");
+    if (frame) frame.src = "about:blank";
+    if (modal) modal.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  (function bindPdf() {
+    var modal = document.getElementById("pdf-modal");
+    if (!modal) return;
+    modal.addEventListener("click", function (e) { if (e.target === modal) closePdf(); });
+    var btn = document.getElementById("pdf-modal-close");
+    if (btn) btn.addEventListener("click", closePdf);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closePdf(); });
+  })();
 
   /* ---------- Init ---------- */
   buildPanels();
