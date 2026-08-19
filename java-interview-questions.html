@@ -180,19 +180,11 @@
   <header class="hero">
     <div class="kicker">Interview Speedrun Collection</div>
     <h1>面试速通<em>全清单</em></h1>
-    <p class="sub">
-      汇总「速通系列」34 份飞书文档 + 3 份本地笔记：11 个核心 Tab（1479 题全部含完整答案）、20 份技术文档题目清单（1634 题）、4 份无权限链接。
-      支持勾选打卡（自动保存）、按优先级筛选、关键词搜索、答案展开收起；总览卡片点击即可进入对应 Tab。
-    </p>
     <div class="stats">
-      <div class="stat s1"><div class="num" id="statDocs">37</div><div class="lbl">文档总数</div></div>
+      <div class="stat s1"><div class="num" id="statDocs">24</div><div class="lbl">文档总数</div></div>
       <div class="stat s2"><div class="num" id="statQs">0</div><div class="lbl">题目总数</div></div>
       <div class="stat s3"><div class="num" id="statAns">0</div><div class="lbl">含完整答案</div></div>
       <div class="stat s4"><div class="num" id="statTabs">11</div><div class="lbl">核心 Tab</div></div>
-    </div>
-    <div class="callout">
-      标签说明：<strong>面试必考 / 高频 / 必须掌握 / 了解即可</strong> 来自原文档标注；<strong>AI 补充</strong> 表示原文档未提供独立答案、由 AI 补写的完整回答。
-      答案中 <strong>[原文档此处有配图]</strong> 表示原位置为截图，请查阅原文链接。
     </div>
   </header>
 
@@ -201,7 +193,7 @@
   <section class="panel" id="panel-overview">
     <figure class="chart-figure">
       <figcaption>各文档题量分布</figcaption>
-      <div class="chart-sub">含完整答案的文档以主色展示，题目清单类文档以浅色展示</div>
+      <div class="chart-sub">全部文档均已含完整答案（含飞书原文答案或 AI 补写）</div>
       <div id="chart-docs" style="width:100%;min-height:560px"></div>
     </figure>
     <div id="linkgroups"></div>
@@ -219,18 +211,6 @@
   <section class="panel" id="panel-mq"></section>
   <section class="panel" id="panel-net"></section>
   <section class="panel" id="panel-others"></section>
-
-  <footer>
-    <div class="sources">
-      <h2>来源</h2>
-      <ol>
-        <li><span class="src-title">飞书文档：4小时速通Agent 面试（文档系列导航页，含全部 36 个文档链接）</span><br>
-          <a href="https://utxc8uqzfk.feishu.cn/wiki/MyrjwtWSNimJ5IkDUPkcGRLfnRa" target="_blank" rel="noopener">https://utxc8uqzfk.feishu.cn/wiki/MyrjwtWSNimJ5IkDUPkcGRLfnRa</a></li>
-        <li><span class="src-title">飞书文档：2小时速通Java（更新ing，先看重点，二八法则！）</span><br>
-          <a href="https://utxc8uqzfk.feishu.cn/wiki/MWlXwd9F1i08xOkYrAhcDDdhn9c" target="_blank" rel="noopener">https://utxc8uqzfk.feishu.cn/wiki/MWlXwd9F1i08xOkYrAhcDDdhn9c</a></li>
-      </ol>
-    </div>
-  </footer>
 </div>
 
 <!-- REQUIRED: ECharts -->
@@ -248,6 +228,14 @@
 <script src="assets/data-mq.js"></script>
 <script src="assets/data-net.js"></script>
 <script src="assets/data-others.js"></script>
+<script src="assets/data-oa2-borrow.js"></script>
+<script src="assets/data-oa2-cc.js"></script>
+<script src="assets/data-oa2-kafka.js"></script>
+<script src="assets/data-oa2-pg.js"></script>
+<script src="assets/data-oa2-go.js"></script>
+<script src="assets/data-oa2-design.js"></script>
+<script src="assets/data-oa2-dist.js"></script>
+<script src="assets/data-oa2-rs.js"></script>
 <script src="assets/data-patch.js"></script>
 <script src="assets/data-patch2.js"></script>
 <script src="assets/data-patch3.js"></script>

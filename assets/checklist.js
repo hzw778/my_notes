@@ -99,15 +99,20 @@
       docStats.push({ name: DATA[k].title.replace(/（更新ing[^）]*）/, "").replace(/^(\d+小时|\d+分钟|一周)/, "").replace("速通", "速通·"), raw: DATA[k].title, count: n, answered: a, status: "full", key: k });
     });
     OTHERS.forEach(function (d) {
-      var n = 0; d.chapters.forEach(function (c) { n += c.questions.length; });
+      var n = 0, a = 0;
+      var AIo = window.OTHERS_AI || {};
+      d.chapters.forEach(function (c) {
+        c.questions.forEach(function (q) { n++; if (otherDocAns(d, q) || AIo[d.key + q.t]) a++; });
+      });
       listQ += n;
-      docStats.push({ name: d.title.replace(/（更新ing[^）]*）/, ""), raw: d.title, count: n, answered: 0, status: "list", key: d.key });
+      docStats.push({ name: d.title.replace(/（更新ing[^）]*）/, ""), raw: d.title, count: n, answered: a, status: "list", key: d.key });
     });
 
     var statQs = document.getElementById("statQs");
     var statAns = document.getElementById("statAns");
+    var listA = docStats.filter(function (s) { return s.status === "list"; }).reduce(function (s2, x) { return s2 + x.answered; }, 0);
     if (statQs) statQs.textContent = (fullQ + listQ).toLocaleString();
-    if (statAns) statAns.textContent = fullA.toLocaleString();
+    if (statAns) statAns.textContent = (fullA + listA).toLocaleString();
 
     var lg = document.getElementById("linkgroups");
     var html = "";
@@ -124,10 +129,10 @@
             desc = st ? st.count + " 题 · 全部含答案" : "含完整答案";
           } else if (it.status === "list") {
             var st2 = docStats.filter(function (s) { return s.key === it.key; })[0];
-            desc = st2 ? st2.count + " 题 · 题目清单（见清单库）" : "题目清单";
+            desc = st2 ? st2.count + " 题 · 含完整答案（清单库）" : "含完整答案";
           }
         }
-        var stTxt = it.status === "full" ? "全文+答案" : it.status === "list" ? "题目清单" : it.status === "mine" ? "已收录" : "无权限";
+        var stTxt = it.status === "full" ? "全文+答案" : it.status === "list" ? "全文+答案" : it.status === "mine" ? "已收录" : "无权限";
         var goto = null;
         if (it.status === "mine") goto = "mine";
         else if (it.key && DATA[it.key]) goto = it.key;
@@ -210,11 +215,30 @@
     panel.innerHTML = html;
   }
 
-  /* ---------- Others tab (list-only) ---------- */
+  /* ---------- Others tab (with answers from doc or AI) ---------- */
+  function otherDocAns(d, q) {
+    if (q.s != null && window.OTHERS_SHARED && hasAns(window.OTHERS_SHARED[q.s])) return window.OTHERS_SHARED[q.s];
+    return "";
+  }
+
   function renderOthers() {
     var panel = document.getElementById("panel-others");
+    var AI = window.OTHERS_AI || {};
+    var docAns = 0, aiAns = 0, noAns = 0;
+    OTHERS.forEach(function (d) {
+      d.chapters.forEach(function (c) {
+        c.questions.forEach(function (q) {
+          var ai = AI[d.key + q.t];
+          if (otherDocAns(d, q)) docAns++;
+          else if (ai) aiAns++;
+          else noAns++;
+        });
+      });
+    });
     var html =
-      '<div class="callout" style="margin-top:.6rem">以下 <strong>' + OTHERS.length + ' 份文档</strong>仅抓取到<strong>题目大纲</strong>（原文档正文未开放或以图片为主），此处汇总为题目清单，可勾选打卡追踪学习进度；点击文档标题可跳转原文查看答案。</div>';
+      '<div class="callout" style="margin-top:.6rem">' + OTHERS.length + ' 份扩展技术文档共 <strong>' + (docAns + aiAns + noAns) + ' 题</strong>：' +
+      '<strong>' + docAns + '</strong> 题含飞书原文答案、<strong>' + aiAns + '</strong> 题为 AI 补写答案' +
+      (noAns ? '、' + noAns + ' 题暂缺' : '') + '。</div>';
     OTHERS.forEach(function (d, di) {
       var n = 0; d.chapters.forEach(function (c) { n += c.questions.length; });
       html += '<section class="chapter" style="margin-top:1.2rem">' +
@@ -229,12 +253,18 @@
           var id = "others:" + di + ":" + gid;
           var tagCls = q.p || "know";
           var tagTxt = q.tag || PRI_LABEL[q.p] || "";
+          var ai = !otherDocAns(d, q) ? AI[d.key + q.t] : null;
+          var ansHtml = otherDocAns(d, q) || ai;
           html += '<div class="qa" data-gid="' + id + '" data-pri="' + (q.p || "") + '" data-text="' + esc(q.t.toLowerCase()) + '">' +
             '<div class="qa-head">' +
             '<label class="chk"><input type="checkbox" data-id="' + id + '"' + (progress[id] ? " checked" : "") + '><span class="box"></span></label>' +
-            '<span class="qtext-btn" style="flex:1;font-size:.92rem;line-height:1.55"><span class="gid">#' + String(gid).padStart(3, "0") + '</span><span class="qtext">' + esc(q.t) + "</span></span>";
+            '<button class="qtext-btn" data-twist style="flex:1;font-size:.92rem;line-height:1.55;text-align:left;background:none;border:none;cursor:pointer;color:inherit;padding:0;font-family:inherit"><span class="gid">#' + String(gid).padStart(3, "0") + '</span><span class="qtext">' + esc(q.t) + "</span></button>";
           if (tagTxt) html += '<span class="tag ' + tagCls + '">' + esc(tagTxt) + "</span>";
-          html += "</div></div>";
+          if (ai) html += '<span class="tag ai" title="原文档未提供答案，由 AI 补写">AI补充</span>';
+          if (ansHtml) html += '<button class="twist" data-twist>答案</button>';
+          html += "</div>";
+          if (ansHtml) html += '<div class="answer">' + ansHtml + "</div>";
+          html += "</div>";
         });
       });
       html += "</section>";

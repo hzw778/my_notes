@@ -14,7 +14,7 @@
   var names = stats.map(function (s) { return s.name; });
   var counts = stats.map(function (s) { return s.count; });
   var colors = stats.map(function (s) {
-    return s.status === "full" ? new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+    return s.answered > 0 ? new echarts.graphic.LinearGradient(0, 0, 1, 0, [
       { offset: 0, color: accent }, { offset: 1, color: accent2 }
     ]) : "rgba(100,116,139,0.35)";
   });
@@ -26,7 +26,7 @@
       trigger: "item",
       formatter: function (p) {
         var s = stats[p.dataIndex];
-        var tag = s.status === "full" ? "全文+答案（含答案 " + s.answered + " 题）" : "题目清单（无答案）";
+        var tag = s.answered > 0 ? "含完整答案 " + s.answered + " / " + s.count + " 题" : "题目清单（无答案）";
         return "<b>" + s.raw + "</b><br/>题目数：" + s.count + "<br/>" + tag;
       }
     },
