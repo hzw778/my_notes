@@ -86,6 +86,56 @@
   var state = { tab: "overview", filter: {}, query: {} };
   var docStats = [];
 
+  /* ---------- Mine-scope (each local note opens only its own chapters) ---------- */
+  var SCOPE_LABEL = {
+    paizi: "派聪明知识点（技术派）",
+    ragjianli: "派聪明RAG简历（含面经收集）",
+    qiyemianshi: "面试题收集（企业面经）",
+    agentmianjing: "agent面经收集",
+    qoder: "派聪明QORDER_NOTE"
+  };
+  function chapterScope(title) {
+    if (title.indexOf("派聪明知识点") >= 0) return "paizi";
+    if (title.indexOf("派聪明RAG简历") >= 0) return "ragjianli";
+    if (title.indexOf("面试题收集") >= 0) return "qiyemianshi";
+    if (title.indexOf("agent面经") >= 0) return "agentmianjing";
+    return "qoder";
+  }
+  var mineScope = null;
+  var pendingMineScope = null;
+  function applyMineScope() {
+    var panel = document.getElementById("panel-mine");
+    if (!panel) return;
+    var sc = mineScope;
+    panel.querySelectorAll(".chapter").forEach(function (sec) {
+      var h = sec.querySelector("h2");
+      var title = h ? h.textContent : "";
+      var match = sc == null || chapterScope(title) === sc;
+      sec.classList.toggle("hidden-chapter", !match);
+    });
+    var banner = document.getElementById("mine-scope-banner");
+    if (banner) {
+      if (sc) {
+        banner.style.display = "";
+        var titleEl = document.getElementById("mine-scope-title");
+        if (titleEl) titleEl.textContent = SCOPE_LABEL[sc] || sc;
+      } else {
+        banner.style.display = "none";
+      }
+    }
+    refreshTab("mine");
+  }
+  function clearMineScope() {
+    mineScope = null;
+    pendingMineScope = null;
+    applyMineScope();
+  }
+  function enterMineScope(scope) {
+    pendingMineScope = scope;
+    switchTab("mine");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   /* ---------- Panels (core static, others dynamic) ---------- */
   function buildPanels() {
     var wrap = document.querySelector(".wrap");
@@ -123,6 +173,12 @@
 
   function switchTab(key) {
     state.tab = key;
+    if (key === "mine") {
+      if (pendingMineScope) { mineScope = pendingMineScope; pendingMineScope = null; }
+      else { mineScope = null; }
+    } else {
+      mineScope = null; pendingMineScope = null;
+    }
     document.querySelectorAll(".tabbtn").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-tab") === key);
     });
@@ -133,6 +189,7 @@
     var cur = (location.hash || "").replace(/^#/, "");
     if (cur !== key && key) { try { history.replaceState(null, "", "#" + key); } catch (e) {} }
     if (OTHER_KEYS.indexOf(key) >= 0 && !othersLoaded) loadOthers();
+    if (key === "mine" && mineScope) applyMineScope();
   }
 
   /* ---------- Lazy-load other docs ---------- */
@@ -226,6 +283,7 @@
         if (isPdf) attrs += ' data-pdf="' + esc(url) + '" data-pdf-title="' + esc(cleanTitle(it.title)) + '"';
         else if (goto) attrs += ' data-goto="' + goto + '"';
         else attrs += ' target="_blank" rel="noopener"';
+        if (goto === "mine" && it.scope) attrs += ' data-miner="' + esc(it.scope) + '"';
         html += '<a class="linkcard" ' + attrs + ">" +
           '<span class="ic">' + (it.icon || "📄") + "</span>" +
           '<span class="meta"><span class="t">' + esc(cleanTitle(it.title)) + "</span>" +
@@ -245,6 +303,8 @@
       var card = e.target.closest(".linkcard[data-goto]");
       if (!card) return;
       e.preventDefault();
+      var miner = card.getAttribute("data-miner");
+      if (miner) { enterMineScope(miner); return; }
       switchTab(card.getAttribute("data-goto"));
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -289,6 +349,11 @@
              : "<strong>" + esc(d.title) + "</strong>（本地 Markdown 笔记解析）") + "</p>";
 
     var gid = 0;
+    if (key === "mine") {
+      html += '<div id="mine-scope-banner" class="scope-banner" style="display:none">' +
+        '<span class="scope-banner-txt">正在定位：<strong id="mine-scope-title"></strong></span>' +
+        '<button type="button" id="mine-scope-close" class="scope-close">显示全部章节</button></div>';
+    }
     html += '<div data-chapters="' + key + '">';
     d.chapters.forEach(function (c) {
       html += '<section class="chapter">';
@@ -313,6 +378,14 @@
     });
     html += "</div>";
     panel.innerHTML = html;
+    if (key === "mine") {
+      var closeBtn = document.getElementById("mine-scope-close");
+      if (closeBtn) closeBtn.addEventListener("click", function () {
+        clearMineScope();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      applyMineScope();
+    }
   }
 
   /* ---------- Other doc tab (each ext doc = one tab) ---------- */
