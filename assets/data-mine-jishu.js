@@ -3,6 +3,350 @@ window.TAB_DATA = window.TAB_DATA || {};
   var mine = window.TAB_DATA["mine"] || (window.TAB_DATA["mine"] = { key: "mine", title: "我的整理（本地笔记）", url: "", chapters: [] });
   mine.chapters.push({
     "no": "1",
+    "title": "技术派·ReAct+plan+Multi-Agent（3 题）",
+    "questions": [
+      { "t": "ReAct+plan+Multi-Agent · 文章导读与背景", "tag": "技术派·ReAct+plan+Multi-Agent", "p": "core", "html": `<p>第一弹，聚焦 <strong>Agent 核心架构</strong>——ReAct、Plan-and-Execute、Multi-Agent、异步并行。</p>
+<p>这几个方向面试出现的频率最高，也是 PaiCLI 第 1、2、5、7 期的核心内容。</p>` },
+      { "t": "ReAct+plan+Multi-Agent · 01、什么是 ReAct 模式？", "tag": "技术派·ReAct+plan+Multi-Agent", "p": "core", "html": `<p>ReAct 是 Reasoning + Acting 的缩写，Yao et al.（姚顺雨）在 2022 年提出。</p>
+<p>核心就一句话：让 LLM 在推理的同时能执行动作，根据动作结果继续推理，形成一个闭合的循环。</p>
+<p><img src="assets/jimg/17ec57fc42ca3bfcbd492b48ea9d8f14.png" decoding="async" fetchpriority="high" width="2808" height="2758"></p>
+<p>PaiCLI 第一期的 <code>Agent.java</code> 就是一个标准的 ReAct 实现。核心是一个 while 循环，每轮做三件事：</p>
+<ul>
+ <li>把消息历史发给 LLM、</li>
+ <li>检查响应里有没有 <code>tool_calls</code></li>
+ <li>有的话执行工具把结果塞回历史。</li>
+</ul>
+<p>LLM 不再返回 <code>tool_calls</code> 就退出循环，把最终回复输出给用户。</p>
+<p>整个 Agent 的骨架就这么简单。</p>
+<h3>它和 Chain-of-Thought 有什么区别？</h3>
+<p>Chain-of-Thought（CoT）只推理不执行。</p>
+<p>LLM 一口气想完所有步骤，直接输出最终答案。做数学题、逻辑推理可以，但碰到“帮我读一下 pom.xml”这种需要外部信息的任务就歇菜了——LLM 没有读文件的能力，想得再好也是瞎猜。</p>
+<p><img src="assets/jimg/309db8320d23e618fa6660cabbb2f734.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3276" height="2994"></p>
+<p>ReAct 的突破在于加了 Action 和 Observation 两个环节。LLM 想到“我需要读 pom.xml”，就输出一个 <code>read_file</code> 的 tool_call，Agent 真去读了文件，把内容返回回来，LLM 基于真实的内容继续推理。</p>
+<p>用一个表格说清楚两者的边界：</p>
+<table>
+ <thead>
+  <tr>
+   <th>维度</th>
+   <th>CoT</th>
+   <th>ReAct</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>能力范围</td>
+   <td>纯推理</td>
+   <td>推理 + 外部工具调用</td>
+  </tr>
+  <tr>
+   <td>信息来源</td>
+   <td>训练数据里的知识</td>
+   <td>实时获取（文件、命令、搜索）</td>
+  </tr>
+  <tr>
+   <td>适合场景</td>
+   <td>数学、逻辑、代码生成</td>
+   <td>需要与外部世界交互的任务</td>
+  </tr>
+  <tr>
+   <td>典型产品</td>
+   <td>ChatGPT 的思考过程</td>
+   <td>Claude Code、PaiCLI、Cursor</td>
+  </tr>
+ </tbody>
+</table>
+<p>面试官追问到这一步，可以补一句：</p>
+<p>PaiCLI 的 LLM 响应里也有 <code>reasoning_content</code>（思考过程），这个其实就是 CoT 的部分。</p>
+<p>ReAct 不是替代 CoT，而是在 CoT 的基础上加了行动能力。PaiCLI 的源码里，<code>reasoning_content</code> 只写日志不进下一轮对话历史，避免思考过程占用 Token 预算。</p>` },
+      { "t": "ReAct+plan+Multi-Agent · 02、Agent 怎么知道该调用哪个工具？", "tag": "技术派·ReAct+plan+Multi-Agent", "p": "core", "html": `<p>这道题很多人会答错，以为 Agent 里有个什么路由规则在做工具匹配。实际上 <strong>Agent 本身不做工具选择，选择权完全在 LLM 手里</strong>。</p>
+<p>流程是这样的：Agent 在构造请求时，把所有可用工具的定义（名称 + 描述 + 参数 JSON Schema）放在请求体的 <code>tools</code> 字段里发给 LLM。LLM 根据用户意图和工具描述，在响应的 <code>tool_calls</code> 字段里返回工具名和参数 JSON。</p>
+<p>这就是 OpenAI 定义的 <strong>Function Calling</strong> 协议，GLM、DeepSeek、Kimi 这些国产模型也都兼容。</p>
+<p><img src="assets/jimg/2254cba36fc45bc885fdcd9fe606b911.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3196" height="2570"></p>
+<p>PaiCLI 的 <code>ToolRegistry.java</code> 维护了一个工具注册表。每个工具注册时提供 name、description、parameters schema。Agent 每次请求 LLM 前，从注册表拉出全量工具定义塞进请求体。LLM 返回 <code>tool_calls: [{name: "read_file", arguments: {path: "pom.xml"}}]</code>，Agent 就从注册表里找到 <code>read_file</code> 的执行逻辑来跑。</p>
+<pre><code class="language-java">// ToolRegistry.java 核心结构
+private final Map<String, ToolDefinition> tools = new LinkedHashMap<>();
+private final Map<String, ToolExecutor> executors = new LinkedHashMap<>();
+
+public String executeTool(String name, String argumentsJson) {
+    ToolExecutor executor = executors.get(name);
+    if (executor == null) {
+        return "未知工具: " + name;
+    }
+    return executor.execute(argumentsJson);
+}
+</code></pre>
+<p>这里有个实战经验值得提一下：<strong>工具描述的质量直接决定 LLM 的选择准确率</strong>。</p>
+<p>PaiCLI 早期 <code>execute_command</code> 的描述写得太简洁，LLM 经常用...</p>` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "2",
+    "title": "技术派·Memory与Context（4 题）",
+    "questions": [
+      { "t": "Memory与Context · 文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王这次换了副金丝眼镜，像极了某个互联网大厂的 CTO，眼神犀利但嘴角带笑，看起来今天心情不错。</p>
+<p>老王翻了翻我的简历，“你这个 PaiCLI 写了三层记忆架构、RAG 向量检索、长上下文自适应，挺能吹的啊。”</p>
+<p>（内心 OS：王哥你别说吹，这些我一行一行码出来的😤）</p>
+<p>我说：“王哥，这几块确实是 PaiCLI 的核心。记忆系统做了三期，第 3 期做 Memory、第 4 期做 RAG 代码库理解、第 12 期做长上下文工程。最近还做了两个升级——长期记忆加了项目级隔离，代码检索从 RAG 一把梭改成了精确搜索优先、RAG 语义兜底。”</p>
+<p>老王露出感兴趣的表情：“行，那就从记忆系统开始聊。”</p>` },
+      { "t": "Memory与Context · 01、Agent 的记忆系统分哪几层", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
+      { "t": "Memory与Context · 文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“先说说整体架构，你们的记忆系统是怎么分层的？”</p>
+<p>我说：“三层。短期记忆、长期记忆、外部记忆。”</p>
+<p><img src="assets/jimg/1e4626397a789df80630d790a612f7b7.jpg" decoding="async" fetchpriority="high" width="3312" height="2482"></p>
+<p>短期记忆就是当前对话的消息历史——用户输入、模型回复、工具调用和结果，每一轮都在追加。生命周期是一次会话，关掉终端就没了。</p>
+<p>长期记忆是跨会话持久的。</p>
+<p>用户说“记一下这个项目用 Java 17”，Agent 就把这条事实写到本地 JSON 文件里。下次开新会话，Agent 从文件里检索和当前对话相关的条目，注入到上下文中。这样跨会话 Agent 也能“记住”用户的偏好和项目背景。</p>
+<p>外部记忆就是通过检索访问的外部知识库，不在对话历史里常驻，需要的时候按需查。</p>
+<p>PaiCLI 的外部记忆有两条路：</p>
+<ul>
+ <li>一条是精确搜索，按关键字或正则实时扫描项目文件树；</li>
+ <li>另一条是 RAG 向量语义检索，从预建的 Embedding 索引里找相关代码段。</li>
+</ul>
+<p>Agent 优先走精确搜索，只有查询太模糊、关键词难确定的时候才走 RAG。</p>
+<p>老王追问：“三层之间怎么协调？”</p>
+<p>我说：“有一个统一的管理者负责协调。每轮请求模型之前，它会做三件事：从长期记忆里检索相关条目，从外部记忆拿到检索结果，然后把这些和短期记忆里的对话历史一起拼装成完整的 prompt 发给模型。三层各司其职，管理者负责‘调度’。”</p>` },
+      { "t": "Memory与Context · 02、短期记忆会溢出吗", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“对话聊久了，短期记忆会不会撑爆上下文窗口？”</p>
+<p>我说：“会。”</p>
+<p>模型有上下文窗口限制，GLM-5.1 是 2...</p>` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "3",
+    "title": "技术派·tool call 和 HITL（1 题）",
+    "questions": [
+      { "t": "tool call和HITL · 01、Function Calling 的原理是什么", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王开门见山：“很多人觉得大模型能‘调用工具’很神奇，你给我讲讲 Function Calling 到底是怎么回事。”</p>
+<p>Function Calling 是一个协议约定。</p>
+<p>客户端在请求里声明有哪些工具可以用，包括工具名、功能描述、参数的 JSON Schema。LLM 在生成响应的时候，如果判断当前任务需要工具辅助，它会在响应里输出一段 JSON，告诉客户端“我想调用这个工具，参数是这些”。然后客户端拿到这段 JSON，自己去执行对应的逻辑，把执行结果包装成 tool message 塞回对话历史，再请求一次 LLM，LLM 看到结果继续推理。</p>
+<p><img src="assets/jimg/a2f7b2303d10d568c9f95d9f4489218c.jpg" decoding="async" fetchpriority="high" width="2960" height="2830"></p>
+<p>所以本质上 LLM 是一个“决策者”，它决定用什么工具、传什么参数，但真正的“执行权”在客户端。</p>
+<p>PaiCLI 的 ToolRegistry 维护了工具名到执行函数的映射表，LLM 说“我要调 read_file”，Agent 就从注册表里找到 read_file ...</p>` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "4",
+    "title": "技术派·MCP+CDP（3 题）",
+    "questions": [
+      { "t": "MCP+CDP · 01、MCP 是什么，解决了什么问题", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
+      { "t": "MCP+CDP · 文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>MCP 全称 Model Context Protocol，是 A 厂在 2024 年底推出的开放协议，一句话概括就是：<strong>给 AI 应用和外部工具之间定了一套标准通信接口</strong>。</p>
+<p><img src="assets/jimg/28f13a6f8b206dddd0612570a59593de.png" decoding="async" fetchpriority="high" width="960" height="540"></p>
+<h4>为什么需要这个协议？</h4>
+<p>没有 MCP 之前，每个 AI 应用想接入一个新工具就得自己写一套定制代码，你写你的，我写我的，重复劳动。</p>
+<p>Claude Code 要接入 GitHub，写一套；Qoder 要接入 GitHub，再写一套——干的活一模一样，但代码完全不能复用。</p>
+<p>有了 MCP 就不一样了，GitHub 官方只需要写一个 MCP Server，所有支持 MCP 的 AI 应用直接接入，和当年 USB 统一接口一个道理。</p>
+<h4>它具体解决了哪几个问题</h4>
+<p>说白了就三件事。</p>
+<p><img src="assets/jimg/cd05a5f1e7b58580c680b71a5f897d34.jpg" decoding="async" loading="lazy" fetchpriority="low" width="2848" height="3058"></p>
+<p><strong>工具发现</strong>——Host 启动 MCP Server 后，调一次 tools/list 就知道这个 Server 能干啥，不用提前硬编码。</p>
+<p><strong>工具调用</strong>——统一走 tools/call 接口，不管底层是 Git 操作、浏览器操控还是数据库查询，调用方式一模一样，对 Agent 来说完全无感。</p>
+<p><strong>数据访问</strong>——resources/list 加 resources/read 让 Server 暴露可读取的数据源，LLM 需要上下文的时候直接拿。</p>` },
+      { "t": "MCP+CDP · 02、MCP 的 stdio 传输和 Streamable HT...", "tag": "技术派·MCP+CDP", "p": "core", "html": `` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "5",
+    "title": "技术派·Prompt与Skill（3 题）",
+    "questions": [
+      { "t": "Prompt与Skill · 文章导读与背景", "tag": "技术派·Prompt与Skill", "p": "core", "html": `<p>AI Agent 面试题系列第五弹，这次聊的是<strong>Prompt 与 Skill。</strong></p>
+<p>Prompt 是 Agent 的灵魂。</p>
+<p>写得好，Agent 知道什么时候该用什么工具、碰到异常该怎么处理；写得差，Agent 干啥啥不行。</p>
+<p>而 <strong>Skill</strong> 是把 prompt 工程化的手段——从“一坨几千字的 system prompt”变成“按场景按需加载的专家手册”，既能降低 token 的消耗，又能提升 Agent 的行为质量。</p>
+<p><img src="assets/jimg/529bfd3ec60dac08964a30b6509d0ccf.jpg" decoding="async" fetchpriority="high" width="4048" height="2762"></p>` },
+      { "t": "Prompt与Skill · 01、Agent 的 system prompt 一般包含哪些内容？", "tag": "技术派·Prompt与Skill", "p": "core", "html": `<p>PaiCLI 的 system prompt 可以概括为四个核心模块。</p>
+<p>首先是<strong>角色定义</strong>，告诉 LLM 你是谁、能做什么。PaiCLI 的 base.md 第一段就写了：你是 PaiCLI，一个面向代码库工作的智能编程 Agent。</p>
+<p><img src="assets/jimg/paicli-interview-prompt-skill-20260528104912.png" decoding="async" loading="lazy" fetchpriority="low" width="2444" height="1326"></p>
+<p>然后是<strong>行为规范</strong>，负责输出格式、语调等。比如 base.md 里有个 <code>## Language</code> 模块，明确写了“请用中文回复用户”，代码和 API 名称才保留原文。组装的时候会要求这个模块必须存在。</p>
+<p>第三块是<strong>工具使用指导</strong>。不能只写“合理使用工具”这类泛化要求，而要具体到场景——读文件用 <code>read_file</code>，不要用 <code>execute_command cat</code>。</p>
+<p>第四块是<strong>安全约束</strong>，明确哪些操作不能做、哪些操作需要用户确认。</p>` },
+      { "t": "Prompt与Skill · 02、Prompt 分层架构是怎么设计的？", "tag": "技术派·Prompt与Skill", "p": "core", "html": `<p>PaiCLI 早期的 system prompt 是硬编码在 Java 代码里的，改一句话要重新编译。后来做了分层改造，把 system prompt 拆分成独立的 Markdown 文件，按职责分目录存放。</p>
+<p>先看目录结构：</p>
+<pre><code>src/main/resources/prompts/
+├── base.md        ...</code></pre>` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "6",
+    "title": "技术派·TUI、LSP、Git、Runtime API（3 题）",
+    "questions": [
+      { "t": "TUI/LSP/Git/Runtime · 01、Agent CLI 的终端渲染有哪些方案", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
+      { "t": "TUI/LSP/Git/Runtime · 文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>三种。</p>
+<p>第一种是纯文本输出。</p>
+<p>直接 print。好的地方是兼容性最强，任何终端都能正常显示。不好的地方也很明显，没有颜色、没有折叠、没有状态栏，信息密度低，用户体验差。</p>
+<p>第二种是 Inline 流式输出，也是 PaiCLI 的默认方案。底部固定一个状态栏，显示当前模型、token 用量、上下文窗口占比、运行耗时。</p>
+<p>最关键的是工具调用可以折叠。比如说 Agent 读了 3 个文件，终端只显示一行折叠摘要，按 Ctrl+O 展开可以查看具体内容。文件修改也有行内 diff 对比，改了什么一目了然。</p>
+<p><img src="assets/jimg/paicli-interview-productization-20260529075735.png" decoding="async" fetchpriority="high" width="3520" height="1790"></p>
+<p>第三种是全屏 TUI。独占整个终端窗口，可以做文件树、分栏布局、弹窗。用户体验最丰富，但需要全屏模式。PaiCLI 基于 Lanterna 库实现了这个方案，有对话区、状态栏和模态弹窗做审批确认。</p>
+<p>最终我们选择了 Inline 作为默认的交互方式，因为它在信息密度和用户体验之间达到了一个不错的平衡。比较接近Claude Code和Qoder CLI的交互方式。</p>` },
+      { "t": "TUI/LSP/Git/Runtime · 02、DECSTBM 是什么？状态栏怎么实现的", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>DECSTBM 全称是 DEC Set Top and Bottom Margins，是 VT100 终端定义的转义序列，用来设置终端的滚动区域。</p>
+<p>可以通过一条 <code>ESC[1;{n}r</code> 指令，告诉终端只有第 1 行到第 n 行参与滚动，剩下的行保持不动。</p>
+<p><img src="assets/jimg/paicli-interview-productization-20260529080844.png" decoding="async" loading="lazy" fetchpriority="low" width="3576" height="1674"></p>
+<p>PaiCLI 的做法是把终端底部留出 2 行不参与滚动。主内容在上方正常滚动输出，底部 2 行始终固定显示状态信息。</p>
+<p>第一行是核心状态，包括 HITL 审批开关、MCP Server 连接数、Skill 加载数。</p>
+<p>第二行是运行时数据，包括当前模型名称、运行阶段、上下文窗口使用率（用进度条可视化显示占比）、输入输出 token 数、缓存命中数、预估费用、运行耗时和当前工作目录。</p>
+<p>注意，不是所有终端都支持 DECSTBM。</p>
+<p>PaiCLI 在初始化时会检测终端能力，检查是否支持 ANSI、终端尺...</p>` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "7",
+    "title": "技术派·多模型和提示词缓存（4 题）",
+    "questions": [
+      { "t": "多模型和提示词缓存 · 文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>老王这次没废话，直接开问：“PaiCLI 接了几家大模型？”</p>
+<p>“目前支持 GLM、DeepSeek、Kimi、StepFun。”</p>
+<p>“那你 API 调用的代码是不是写了四遍？”老王的语气里带着一点挑衅。</p>
+<p>我笑了：“那不至于，一个基类搞定，每个 Provider 实现就二三十行。”</p>` },
+      { "t": "多模型和提示词缓存 · 01、怎么设计一个支持多模型的 LLM 客户端接口？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
+      { "t": "多模型和提示词缓存 · 文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>策略模式。定义一个统一接口，每个模型的 Provider 自己实现差异化逻辑。</p>
+<p>接口需要声明两组能力。</p>
+<p>第一组是行为能力，也就是对话方法。一般设计两个 chat 方法，一个带流式监听器参数，一个不带。不带监听器的方法内部调用带监听器的。</p>
+<p>第二组是声明式能力。包括模型名称、Provider 名称、最大上下文窗口、是否支持提示词缓存、缓存模式等等。</p>
+<pre><code class="language-java">public interface LlmClient {
+    ChatResponse chat(List<Message> messages, List<Tool> tools) throws IOException;
+    ChatResponse chat(List<Message> messages, List<Tool> tools,
+                      StreamListener listener) throws IOException;
+    String getModelName();
+    String getProviderName();
+    default int maxContextWindow() { return 128_000; }
+    default boolean supportsPromptCaching() { return false; }
+    default String promptCacheMode() { return "none"; }
+}
+</code></pre>
+<h4>为什么要把能力声明放在接口里？</h4>
+<p>因为上下文管理模块需要根据模型能力做策略调整。</p>
+<p>短期记忆预算、压缩触发阈值、MCP 资源索引，这些参数全部可以从上下文窗口大小推导出来。</p>
+<p>接口声明了这些能力后，上层不需要写 if-else 判断“当前是哪个模型”，直接读接口方法的返回值就行。</p>
+<p>四个 Provider 实现类共享一个基类，负责通用的 SSE 解析和 HTTP 请求逻辑，每个子类只覆盖 API 地址、默认模型名、API Key 来源这几个差异点。</p>` },
+      { "t": "多模型和提示词缓存 · 02、模板方法模式在多模型适配里怎么用？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>都兼容 OpenAI 协议。</p>
+<p>就是把相同的部分提到基类里，子类只覆盖差异点。</p>
+<p>基类的 chat 方法定义了完整的 SSE 请求-响应流程：构建请求体、发送 HTTP 请求、逐行解析 SSE 流、合并增量 tool_calls、提取 usage 统计、返回最终响应等。</p>
+<p><img src="assets/jimg/paicli-interview-multi-model-20260530110004.png" decoding="async" fetchpriority="high" width="3668" height="2514"></p>
+<p>所有 Provider 都是一样的。</p>
+<p>子类只需要覆盖三个抽象方法：API 端点地址、默认模型名、API Key。</p>
+<p>拿 DeepSeek 的实现来说，整个类不到 60 行代码，SSE 解析、tool_calls 合并、HTTP 超时处理一行没写，全在基类里。</p>
+<pre><code class="language-java">// DeepSeek 的实现，继承基类后只需覆盖差异点
+protected String getApiUrl() { return "https://api.deepseek.com/chat/completions"; }
+protected String getModel()  { return "deepseek-v4-flash"; }
+protected String getApiKey() { return apiKey; }
+public int maxContextW...</code></pre>` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "8",
+    "title": "技术派·grep 和 RAG（9 题）",
+    "questions": [
+      { "t": "grep和RAG · 文章导读与背景", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>大家好，我是二哥呀。</p>
+<p>有没有想过？</p>
+<p>Claude Code 的代码搜得又快又准，到底是怎么实现的？</p>
+<p><img src="assets/jimg/3a2fd3b0f453d5c1325b945bd32d6b3e.jpg" decoding="async" fetchpriority="high" width="4048" height="2340"></p>
+<p>我花了一早上时间，认真研究了会，翻了翻 Anthropic 首席工程师 Boris Cherny 的播客、亚马逊科学团队发的论文、Cursor 官方博客的论证、Claude Code 源码，把这件事从头到尾捋了一遍。</p>
+<blockquote>
+ <p>系好安全带，我们粗粗发～</p>
+</blockquote>` },
+      { "t": "grep和RAG · 01、Claude Code 到底怎么查找代码的？", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>先回答最基本的问题：Claude Code 在分析代码仓库时，用的是什么工具？</p>
+<p>答案很简单——三个工具：<strong>Glob、Grep、Read</strong>。</p>
+<p>是不是很意外，是不是很惊喜？</p>
+<p><img src="assets/jimg/e37b21cce5581b9e5326eac6c9ceb7ee.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3172" height="2014"></p>
+<ul>
+ <li>Glob 负责按文件名模式匹配，比如 <code>**/*.java</code> 找出所有 Java 文件。返回的结果按修改时间排序。</li>
+ <li>Grep 负责在文件内搜索，底层用的是 ripgrep（一个 Rust 写的高性能搜索工具）。比如我们想找哪个文件里用了 <code>@Transactional</code> 注解，Grep 很快就能返回结果。</li>
+ <li>Read 负责读取具体文件的内容。可以读整个文件，也可以指定行号范围只读一部分。支持图片、PDF、Jupyter Notebook，覆盖面很广。</li>
+</ul>
+<p>没有向量数据库，没有 Embedding 模型，没有索引构建过程，没有 Chunk 分片策略。</p>
+<p>Claude Code 拿到一个任务之后，先用 Glob 看看目录结构，再用 Grep 搜关键词，最后用 Read 读取相关文件。</p>
+<p><img src="assets/jimg/8905383b4c5e69fb8043fb939affeadf.jpg" decoding="async" loading="lazy" fetchpriority="low" width="2048" height="2048"></p>
+<p>Anthropic 内部给这种方式起了个名字，叫 <strong>Agentic Search</strong>（智能体搜索）。</p>
+<p><img src="assets/jimg/ccb48e68600c812174e884a61c315bf7.png" decoding="async" loading="lazy" fetchpriority="low" width="2904" height="1974"></p>
+<p>核心思路是：</p>
+<p>不预先构建任何索引，而是让 Agent 在执行任务的过程中，根据当前的上下文和目标，动态决定搜什么、怎么搜、搜到之后下一步干什么。</p>
+<p>这三个工具还有一个关键属性：它们都是 <code>isConcurrencySafe = true</code> 的只读工具，可以并行执行。Claude Code 经常同时发起多个 Grep 搜索，一次性扫描多个关键词，效率拉满。</p>` },
+      { "t": "grep和RAG · 02、RAG 检索代码的五个问题", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>要理解 Claude Code 为什么不用 RAG，得先搞清楚 RAG 用在代码搜索上到底有什么问题。</p>
+<h3>第一：代码不是自然语言，语义相似度在代码这块不管用。</h3>
+<p>RAG 的核心逻辑是把文本转成向量，然后用余弦相似度找“语义最接近”的内容。</p>
+<p><img src="assets/jimg/527d52f603a6cd42e4f327e80a8f3156.png" decoding="async" loading="lazy" fetchpriority="low" width="1440" height="720"></p>
+<p>这个逻辑在自然语言场景下很好使，比如“如何处理用户认证”和“用户登录流程”语义上确实接近。</p>
+<p>但代码不一样。</p>
+<p><code>createD1HttpClient</code> 和 <code>buildD1HttpClient</code> 语义上很接近，但在代码仓库里它们可能是两个完全不同的函数。我们要找的是那个精确的函数名，不是“差不多的”函数名。</p>
+<p>反过来，<code>handleAuth</code> 和 <code>validateJwtToken</code> 语义上看起来不太相关，但后者可能就是前者内部调用的关键逻辑。向量相似度不会帮我找到这种调用关系，但一个简单的 grep 搜索 <code>validateJwtToken</code> 就能精确定位。</p>
+<p>代码世界里，精确匹配比语义匹配重要得多。</p>
+<p><img src="assets/jimg/5cfdcbc48b6c336d05e665525471b2b0.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3160" height="2438"></p>
+<p>一个变量名、一个方法签名、一个 import 路径，要么完全匹配，要么就是找错了。</p>
+<p>没有“大概对”这回事。</p>
+<h3>第二：索引同步成本很高</h3>
+<p>写代码的小伙伴都知道，代码是不断变化的。</p>
+<p>刚改了一个方法名，RAG 的索引里还是旧的名字。新增了一个文件，索引里没有。删了一个类，索引里还在。</p>
+<p>要保持索引和代码的实时同步，得做增量更新、文件监听、冲突处理。这套东西做起来的复杂度，比 RAG 本身还高。</p>
+<p>而 grep 天然不存在这个问题，它搜索的永远是磁盘上此时此刻的文件内容。代码改了，grep 的结果就跟着变了，不需要任何同步机制。</p>
+<h3>第三：安全和隐私</h3>
+<p>RAG 需要一个 Embedding 模型来生成向量。</p>
+<p>这个模型要么跑在本地（消耗计算资源），要么调用远程 API（代码内容要发到外部服务器）。</p>
+<p><img src="assets/jimg/04f191f1fc08dbdc9b26841789c5728b.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3264" height="2498"></p>
+<p>代码库是“非常敏感”的，我们肯定不愿意把代码发送到任何第三方服务去生成 Embedding。本地部署 Embedding，又需要很高的算力成本。</p>
+<p>grep 直接在本地磁盘上搜索。从安全的角度看，这个优势是碾压级的。</p>
+<p><img src="assets/jimg/da0e7a33d7640393c7ce89abbccc9c3a.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3320" height="2846"></p>` },
+      { "t": "grep和RAG · 03、ripgrep 凭什么这么猛", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>说到 grep，大家可能第一反应是 Linux 上的 GNU grep。</p>
+<p>Claude Code 用的不是这个，是 ripgrep，一个用 Rust 写的现代搜索工具。</p>
+<p><img src="assets/jimg/e746bf9b9133e92fa98a8d09f943f3c5.jpg" decoding="async" loading="lazy" fetchpriority="low" width="4048" height="2800"></p>
+<p>ripgrep 的作者叫 Andrew Gallant，他在 Rust 的正则表达式引擎上花了两年半的时间。这个引擎用了 SIMD 指令集加速，简单说就是用 CPU 的矢量计算单元来做文本匹配，搜索速度能逼近内存带宽的极限。</p>
+<p>一般来说，在一个几万个文件的中型代码仓库里，ripgrep 跑一次全文搜索大概需要 200 毫秒。</p>
+<p>而同样的搜索任务，如果走 RAG 流程：</p>
+<p>先把查询文本发给 Embedding 模型生成向量（一次网络往返），再去向量数据库里做 KNN 搜索（又一次网络往返），拿到结果后可能还要做 Rerank（又一次模型调用）。整个链路下来至少 8 个步骤、四五个服务。</p>
+<p><img src="assets/jimg/0a494256f19f42765191cb3bb94d252d.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3284" height="2142"></p>
+<p>ripgrep 还有几个对 Agent 特别友好的特性。</p>
+<p>它默认递归搜索整个目录，自动跳过 <code>.gitignore</code> 里列出的文件和二进制文件，输出结果自带文件名和行号。这些恰好就是 Agent 在分析代码时最需要的信息。</p>
+<p>Claude Code 的 Grep 工具在 ripgrep 之上还封装了一层保护机制。默认最多返回 250 行（通过 <code>head_limit</code> 控制），防止一次搜索返回几千行代码把上下文窗口撑爆。如果 ripgrep 超时了但有部分结果，它会把最后一行不完整的结果丢掉，返回已经拿到的部分。如果完全没有结果，才会抛出超时错误。</p>
+<p>这种“尽力返回结果”的设计哲学，和 RAG 的“要么成功要么失败”形成了鲜明对比。</p>
+<p><img src="assets/jimg/a1e75663c941d83d673726701b0728b6.png" decoding="async" loading="lazy" fetchpriority="low" width="2308" height="1738"></p>` },
+      { "t": "grep和RAG · 04、Anthropic 官方怎么说", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>这一段的信息来源是 Boris Cherny（Claude Code 首席工程师）2025 年 5 月 7 日在 Latent Space 播客上的原话。这期节目的另一位嘉宾是 Catherine Wu，也是 Claude Code 的核心工程师。</p>
+<p>Boris 说了这样一句：<strong>Claude Code 早期版本确实用过 RAG。</strong></p>
+<p>他们用的是 Voyage 的 Embedding 模型，做了一套本地向量索引。效果“还行”。但后来他们试了另一种方式，就是我们前面说的 Glob + Grep + Read 的 Agentic Search。结果发现这种方式在各项指标上全面碾压 RAG。</p>
+<p>Boris 原话说的是 “outperformed everything, by a lot”（全面超越，而且差距很大）。</p>
+<p><img src="assets/jimg/2f75aafbcdc2ccb781e884f2e3740542.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3128" height="1734"></p>
+<p>他坦承这个判断主要基于“内部 vibes”，也就是直觉和体感，加上一些内部 benchmark 的数据。</p>
+<p>Boris 给出了放弃 RAG 的核心原因。</p>
+<p>第一是性能。Agentic Search 的搜索质量更高。这里的“质量”不只是准确率，还包括搜索结果的可用性。grep 返回的是精确的代码行和文件路径，Agent 拿到就能直接用；RAG 返回的是一堆“相关”的代码片段，Agent 还得二次理解和筛选。</p>
+<p>第二是简洁。RAG 需要维护索引的同步、处理增量更新、管理向量数据库的生命周期。Agentic Search 不需要任何预处理，打开一个代码仓库，直接开始搜，没有“初始化索引”这个步骤。</p>` },
+      { "t": "grep和RAG · 05、亚马逊论文的实锤", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>2025 年 12 月，亚马逊科学团队发表了一篇论文，题目：<strong>“Keyword search is all you need: Achieving RAG-Level Performance without vector databases using agentic tool use”</strong>（关键词搜索就够了：用 Agent 工具调用达到 RAG 级别的性能，不需要向量数据库）。</p>
+<p><img src="assets/jimg/efffd311f5e95b8609cc309e0a9e4fc7.png" decoding="async" loading="lazy" fetchpriority="low" width="3260" height="1926"></p>
+<p>他们的研究方法是：搭建一个标准的 RAG 系统（向量数据库 + Embedding + 检索 + 生成），和一个只有关键词搜索工具的 Agent 系统，然后在相同的问答任务上对比两者的表现。</p>
+<p><img src="assets/jimg/58feadc0755eb1d45abe3df13b76a59e.png" decoding="async" loading="lazy" fetchpriority="low" width="3628" height="2154"></p>
+<p>结论是：<strong>基于关键词搜索的 Agent 系统可以达到传统 RAG 系统 90% 以上的性能指标。</strong></p>
+<p>论文还有一个关键发现：对于代码这种符号精确的结构化文本，关键词搜索的表现实际上比语义检索还要好。因为代码的命名约定通常是一致的，函数名、变量名、类名本身就携带了足够的语义信息，不需要额外的语义理解。</p>` },
+      { "t": "grep和RAG · 06、Cursor 的反面论证", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>说到这里，可能有小伙伴要问了：如果 grep 这么好，为什么 Cursor 还在用向量搜索？</p>
+<p>这是个好问题。</p>
+<p>Cursor 训练了自己的 Embedding 模型，建了一套完整的索引管道，用 Turbopuffer 做向量数据库。他们的 A/B 测试结果显示：加入语义搜索后，Agent 的准确率提升了不少。</p>
+<p><img src="assets/jimg/190ae616c319cfce8814313fa1abfd42.jpg" decoding="async" loading="lazy" fetchpriority="low" width="2800" height="2034"></p>
+<p>在超过 1000 个文件的大型代码仓库中，提升效果更加明显，代码留存率（Agent 写的代码被用户保留的比例）增加了 2.6%。</p>
+<p><img src="assets/jimg/3ae9f97d1d35abf94b7ab574cf99206f.png" decoding="async" loading="lazy" fetchpriority="low" width="1920" height="785"></p>
+<p>几个关键区别。</p>
+<p>第一，Cursor 是 IDE 级别的产品，用户在 IDE 里工作时，代码仓库是相对稳定的，索引同步的压力没那么大。而 Claude Code 是一个命令行工具，用户可能随时切换到不同的代码仓库。</p>
+<p>第二，Cursor 用的是混合检索，grep 和向量搜索都用，而不是只用向量搜索。他们的结论是“两者配合使用效果最好”，而不是“向量搜索比 grep 好”。这反过来证明了 grep 是不可或缺的基础能力。</p>` },
+      { "t": "grep和RAG · 07、LLM 就是最好的 Reranker", "tag": "技术派·grep和RAG", "p": "core", "html": `<p>在 Agentic Search 的架构里，LLM 本身就充当了 Reranker 的角色。</p>
+<p>传统 RAG 的工作流是：Embedding → 向量检索 → Rerank → 生成。</p>
+<p>其中 Rerank 这一步是为了弥补向量检索精度不够的问题，向量搜索返回的“Top K”结果里经常混进不相关的内容，需要一个更精细的模型来重新排序。</p>
+<p>但在 Claude Code 的架构里，grep 返回的结果是确定性的，搜 <code>createD1HttpClient</code> 就只会返回包含这个精确字符串的代码行。Agent 拿到这些精确的搜索结果后，用 LLM 自己的推理能力来判断哪些结果是有用的、接下来应该读哪个文件、还需要搜什么关键词。</p>
+<p>这种模式下，LLM 做的不是简单的 Rerank，而是<strong>理解 + 决策 + 行动</strong>。</p>
+<p>它会根据第一轮搜索的结果调整后续的搜索策略，比如发现一个关键函数调用后，顺藤摸瓜去搜被调用的函数定义。这种多轮迭代的搜索能力，是 RAG 的“一次检索”模式做不到的。</p>
+<p><img src="assets/jimg/eb52d511c981b86581ecab96ed664b56.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3180" height="2706"></p>
+<p>RAG 像是去图书馆让管理员帮忙找书，管理员根据描述找了几本“可能相关”的放到桌上，至于对不对，得自己翻了才知道。</p>
+<p>而 Agentic Search 像是自己去图书馆，先看楼层指引（Glob 看目录结构），再去对应楼层的书架上找（Grep 搜内容），找到了翻开看看（Read 读文件），不对就换个关键词再找。</p>` },
+      { "t": "grep和RAG · 09、简历怎么写", "tag": "技术派·grep和RAG", "p": "core", "html": `<p><strong>项目名称</strong>：PaiCLI 智能代码分析平台</p>
+<p><strong>项目简介</strong>：基于 Agentic Search 架构的代码分析工具，采用 grep + LLM 的方式替代传统 RAG 检索，实现对大型代码仓库的高效分析和理解。</p>
+<p><strong>核心职责</strong>：</p>
+<ul>
+ <li>基于 ripgrep 实现了代码级的全文检索引擎，支持正则表达式和 Glob 模式匹配，单次搜索耗时控制在 200ms 以内</li>
+ <li>设计了 Agent 多轮迭代搜索策略，通过 Glob→Grep→Read 的工具链实现代码上下文的逐步聚焦，搜索精确率达到 95% 以上</li>
+ <li>实现了搜索结果的智能截断机制（head_limit + partial results），将单次搜索的 token 消耗控制在 6K 以内，避免上下文溢出</li>
+</ul>` }
+    ]
+  });
+
+  mine.chapters.push({
+    "no": "9",
     "title": "技术派·腾讯一面 · Agent面经（24 题）",
     "questions": [
       { "t": "腾讯一面 · 文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>不知道大家有没有发现，大模型公司都在卷终端 Agent，包括 Qoder CLI、Kimi Code、ZCode 等等。</p>
@@ -33,8 +377,7 @@ window.TAB_DATA = window.TAB_DATA || {};
  <li>模型底座是哪个？例如写一千行代码，需要消耗多少token?成本是多少？你用的百万token计费是多少？</li>
  <li>你平时用你的PaiCLI么？</li>
 </ol>
-<p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗发～）</p>
-<h2>content</h2>` },
+<p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗发～）</p>` },
       { "t": "腾讯一面 · 01、介绍一下 PaiCLI 这个项目和流程", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
       { "t": "腾讯一面 · 文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王开门见山：“你简历上写了一个 PaiCLI 项目，对标 Claude Code？先介绍一下。”</p>
 <p>我说：“PaiCLI 是一个 Python 写的 Agent 命令行工具，核心架构是 ReAct 循环。”</p>
@@ -194,7 +537,7 @@ window.TAB_DATA = window.TAB_DATA || {};
   });
 
   mine.chapters.push({
-    "no": "2",
+    "no": "10",
     "title": "技术派·拼多多 · Agent面经（32 题）",
     "questions": [
       { "t": "拼多多 · 文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>大家好，我是二哥呀。</p>
@@ -206,8 +549,7 @@ window.TAB_DATA = window.TAB_DATA || {};
 <p>那多模态特征提取到底能不能做到跨 App 的图像识别？协同过滤和深度 CTR 排序在推荐场景里是怎么协作的？Agent 在这类系统里扮演什么角色？</p>
 <p>相信很多小伙伴都好奇，正好我也收集了一份拼多多 Agent 岗的面经，附带我自己的答案一并分享给大家。</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720113925.png" decoding="async" loading="lazy" fetchpriority="low" width="934" height="1676" class="article-content-img--text-shot" style="--article-img-max-width: 467px;"></p>
-<p>（全文比较肝，保证大家能学到很多，系好安全带，我们粗粗粗发了～）</p>
-<h2>content</h2>` },
+<p>（全文比较肝，保证大家能学到很多，系好安全带，我们粗粗粗发了～）</p>` },
       { "t": "拼多多 · 01、拼多多推荐系统背后用到了哪些 AI 技术？", "tag": "技术派·拼多多", "p": "core", "html": `` },
       { "t": "拼多多 · 文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王的第一个问题：“用户看了一张图片，打开拼多多就能看到相关商品推荐。背后是什么原理？”</p>
 <p>如果真能做到跨 App 的图像识别到推荐，大概是这样这样：</p>
@@ -403,14 +745,13 @@ window.TAB_DATA = window.TAB_DATA || {};
   });
 
   mine.chapters.push({
-    "no": "3",
+    "no": "11",
     "title": "技术派·腾讯面试官 · Agent面经（16 题）",
     "questions": [
       { "t": "腾讯面试官 · 文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>大家好，我是二哥呀。</p>
 <p>如果你是一位愿意相信努力、相信过程、相信一步一个脚印、相信自己能在 AI 时代分一杯羹的人，那接下来这份硬核的面经，希望你能认真读一读。</p>
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721163620.png" decoding="async" fetchpriority="high" width="912" height="1336" class="article-content-img--text-shot" style="--article-img-max-width: 456px;"></p>
-<p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗发～）</p>
-<h2>content</h2>` },
+<p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗发～）</p>` },
       { "t": "腾讯面试官 · 01、LLM 和 Agent 之间的联系和区别", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
       { "t": "腾讯面试官 · 文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王第一问是概念题。“讲一下 LLM 和 Agent 之间的联系和区别。”</p>
 <p>“先说联系。Agent 的每一次决策都由 LLM 做出。”</p>
@@ -588,7 +929,7 @@ window.TAB_DATA = window.TAB_DATA || {};
   });
 
   mine.chapters.push({
-    "no": "4",
+    "no": "12",
     "title": "技术派·携程 · Agent面经（22 题）",
     "questions": [
       { "t": "携程 · 文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>看到这样一则爆料。</p>
@@ -611,7 +952,7 @@ window.TAB_DATA = window.TAB_DATA || {};
 <p>如果你也渴望稳定，同时又想在稳定的心态和节奏下学一些新的 AI 知识，那接下来这些 Agent 面试题，可以好好读一读。</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727130023.png" decoding="async" loading="lazy" fetchpriority="low" width="1168" height="1680" class="article-content-img--text-shot" style="--article-img-max-width: 560px;"></p>
 <p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗粗粗发～）</p>
-<h2>content</h2>
+
 <blockquote>
  <p>PS：PaiCLI 是一个类 Claude Code 的终端 Agent，已开源。如果你想拥有一个 Agent 的项目经验，可以参考。</p>
 </blockquote>
@@ -772,7 +1113,7 @@ window.TAB_DATA = window.TAB_DATA || {};
   });
 
   mine.chapters.push({
-    "no": "5",
+    "no": "13",
     "title": "技术派·阿里 · Agent面经（6 题）",
     "questions": [
       { "t": "阿里 · 文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>说实话，我自己也是Qoder系列产品的重度使用者，感觉确实发展快。</p>
@@ -818,8 +1159,7 @@ window.TAB_DATA = window.TAB_DATA || {};
 <p>“因为瓶颈在 LLM API，不在计算资源。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730115151-a6d6eb80.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“假设 LLM 端点的 RPM 上限是 1 万次/分钟，你扩 10 个 实例 还是 100 个 实例，能发出去的请求总量没变。100 个 实例 只是让更多线程同时排队，排队速度不会变快。”</p>
-<p>“真正能提升吞吐的是减少 LLM 调用次数——语义缓存、模型分级、规则引擎前置——把有限的额度留给真正需要大模型推理的请求。”</p>
-<h2>content</h2>` },
+<p>“真正能提升吞吐的是减少 LLM 调用次数——语义缓存、模型分级、规则引擎前置——把有限的额度留给真正需要大模型推理的请求。”</p>` },
       { "t": "阿里 · 01、在构建 Agent 框架时，选择 LangChain/LlamaIndex 还是自研？", "tag": "技术派·阿里", "p": "core", "html": `` },
       { "t": "阿里 · 文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王端起茶杯抿了一口：“框架选型这块，你怎么看 LangChain 这类开源框架和自研？”</p>
 <p>“这个问题我有实际经验。PaiCLI 的核心 Agent 循环是自研的，基于 Spring AI 做模型层抽象。另一个项目 PaiAgent 用了 LangGraph4j 做复杂的 DAG 工作流编排。”</p>
@@ -839,7 +1179,7 @@ window.TAB_DATA = window.TAB_DATA || {};
   });
 
   mine.chapters.push({
-    "no": "6",
+    "no": "14",
     "title": "技术派·海康威视 · Agent评测面经（10 题）",
     "questions": [
       { "t": "海康威视 · 文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>简单给大家科普下。</p>
@@ -869,7 +1209,7 @@ window.TAB_DATA = window.TAB_DATA || {};
 <p>如果你是一位愿意相信努力、相信过程、相信一步一个脚印、相信自己能在 AI 时代分一杯羹的人，那接下来这份硬核的面经，希望你能认真读一读。</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803105756-3dcdeb39.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗粗发～）</p>
-<h2>content</h2>
+
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803144119.png" decoding="async" loading="lazy" fetchpriority="low" width="2286" height="940"></p>
 <blockquote>
  <p>文中涉及的PaiCLI Agent 已经开源到GitHub，Go版本也有：<a href="https://github.com/itwanger/PaiCLI-Python">https://github.com/itwanger/PaiCLI-Python</a></p>
@@ -929,7 +1269,7 @@ window.TAB_DATA = window.TAB_DATA || {};
   });
 
   mine.chapters.push({
-    "no": "7",
+    "no": "15",
     "title": "技术派·长鑫存储 · Agent面经（22 题）",
     "questions": [
       { "t": "长鑫存储 · 文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>看到这样一则爆料，挺有意思。</p>
@@ -947,7 +1287,7 @@ window.TAB_DATA = window.TAB_DATA || {};
 <p>如果你是一位愿意相信努力、相信过程、相信一步一个脚印、相信自己能在 AI 时代分一杯羹的人，那接下来这份硬核的面经，希望你能认真读一读。</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804121732-01ca6052.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗粗发～）</p>
-<h2>content</h2>
+
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804135851.png" decoding="async" loading="lazy" fetchpriority="low" width="2288" height="1382"></p>
 <blockquote>
  <p>文中涉及的PaiCLI Agent 已经开源到GitHub，Go版本也有：<a href="https://github.com/itwanger/PaiCLI-Python">https://github.com/itwanger/PaiCLI-Python</a></p>

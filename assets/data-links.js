@@ -2,14 +2,14 @@ window.LINKS = {
   groups: [
     {
       name: "我的整理（本地笔记）",
-      note: "6 份本地 Markdown 笔记，已拆分为 6 个独立 Tab：556 题、44 章，含完整答案（点击卡片直达对应笔记）",
+      note: "6 份本地 Markdown 笔记，已拆分为 6 个独立 Tab：586 题、52 章，含完整答案（点击卡片直达对应笔记）",
       items: [
         { key: "mine-paizi", icon: "📝", title: "派聪明知识点（技术派）", token: "", status: "mine", note: "42 题 · 文件上传 / RAG / 知识库 / 聊天助手 / 进阶", local: true },
         { key: "mine-rag", icon: "📓", title: "派聪明RAG简历（含面经收集）", token: "", status: "mine", note: "145 题 · PaiSmart 项目 / trae面试 / 6 组面经", local: true },
         { key: "mine-mianshi", icon: "📚", title: "面试题收集（企业面经）", token: "", status: "mine", note: "139 题 · 长亮 / Spring / 网易 / 用友等", local: true },
         { key: "mine-agent", icon: "🤖", title: "agent面经收集", token: "", status: "mine", note: "30 题 · 哔哩AI / 联影 / 影石 / 小厂面经", local: true },
         { key: "mine-qoder", icon: "🗂️", title: "派聪明QORDER_NOTE", token: "", status: "mine", note: "68 节 · RAG 项目 10 大模块 58 技术点 / 上传·解析·向量·Agent·安全·计费等", local: true },
-        { key: "mine-jishu", icon: "🌊", title: "技术派", token: "", status: "mine", note: "132 题 · 腾讯/拼多多/腾讯面试官/携程/阿里/海康/长鑫 Agent 面试篇 · 含 117 张配图", local: true }
+        { key: "mine-jishu", icon: "🌊", title: "paicil_技术派", token: "", status: "mine", note: "162 题 · 15 章（17-24 教学节 + 25-31 Agent 面试篇）· 含 146 张配图", local: true }
       ]
     },
     {

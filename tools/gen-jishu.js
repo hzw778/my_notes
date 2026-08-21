@@ -12,15 +12,26 @@ const IMG_DIR = path.join(PROJ, 'assets', 'jimg');
 
 if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
 
-// ordered config: fileSlug -> { title, icon-suffix }
+// ordered config: fileSlug -> { title, short, split }
+// split 'h3' = mianshi 篇按 H3 分题；split 'h2' = 教学篇按 H2 分题（跳过 "content" 占位标题）
 const articles = [
-  { slug: 'paicli-agent-mianshi', title: '腾讯一面 · Agent面经', short: '腾讯一面' },
-  { slug: 'agent-mianshi-paicli', title: '拼多多 · Agent面经', short: '拼多多' },
-  { slug: 'agent-mianshi-tengxun', title: '腾讯面试官 · Agent面经', short: '腾讯面试官' },
-  { slug: 'agent-mianshi-xiecheng', title: '携程 · Agent面经', short: '携程' },
-  { slug: 'agent-mianshi-ali', title: '阿里 · Agent面经', short: '阿里' },
-  { slug: 'haikang-agent-eval-mianshi', title: '海康威视 · Agent评测面经', short: '海康威视' },
-  { slug: 'agent-mianshi-changxin', title: '长鑫存储 · Agent面经', short: '长鑫存储' },
+  // —— 17~24 教学/实战条目 ——
+  { slug: 'react-plan-multi-agent', title: 'ReAct+plan+Multi-Agent', short: 'ReAct+plan+Multi-Agent', split: 'h2' },
+  { slug: 'memory-context', title: 'Memory与Context', short: 'Memory与Context', split: 'h3' },
+  { slug: 'tool-call-hitl', title: 'tool call 和 HITL', short: 'tool call和HITL', split: 'h3' },
+  { slug: 'paicli-interview-mcp', title: 'MCP+CDP', short: 'MCP+CDP', split: 'h3' },
+  { slug: 'paicli-interview-prompt-skill', title: 'Prompt与Skill', short: 'Prompt与Skill', split: 'h2' },
+  { slug: 'paicli-interview-productization', title: 'TUI、LSP、Git、Runtime API', short: 'TUI/LSP/Git/Runtime', split: 'h3' },
+  { slug: 'paicli-interview-multi-model', title: '多模型和提示词缓存', short: '多模型和提示词缓存', split: 'h3' },
+  { slug: 'paicli-grep-vs-rag', title: 'grep 和 RAG', short: 'grep和RAG', split: 'h2' },
+  // —— 25~31 面试篇 ——
+  { slug: 'paicli-agent-mianshi', title: '腾讯一面 · Agent面经', short: '腾讯一面', split: 'h3' },
+  { slug: 'agent-mianshi-paicli', title: '拼多多 · Agent面经', short: '拼多多', split: 'h3' },
+  { slug: 'agent-mianshi-tengxun', title: '腾讯面试官 · Agent面经', short: '腾讯面试官', split: 'h3' },
+  { slug: 'agent-mianshi-xiecheng', title: '携程 · Agent面经', short: '携程', split: 'h3' },
+  { slug: 'agent-mianshi-ali', title: '阿里 · Agent面经', short: '阿里', split: 'h3' },
+  { slug: 'haikang-agent-eval-mianshi', title: '海康威视 · Agent评测面经', short: '海康威视', split: 'h3' },
+  { slug: 'agent-mianshi-changxin', title: '长鑫存储 · Agent面经', short: '长鑫存储', split: 'h3' },
 ];
 
 // image url -> local filename mapping (per whole run)
@@ -91,6 +102,41 @@ function splitByH3(html) {
   return parts;
 }
 
+// split teaching articles by H2; skip a placeholder heading whose text is "content"/empty,
+// merging its following body into the previous question
+function splitByH2(html) {
+  const heads = [];
+  const re = /<h2[^>]*>([\s\S]*?)<\/h2>/g;
+  let mm;
+  while ((mm = re.exec(html)) !== null) {
+    heads.push({ title: mm[1].replace(/<[^>]+>/g, '').trim(), start: mm.index, end: mm.index + mm[0].length });
+  }
+  const segs = [];
+  if (!heads.length) {
+    segs.push({ title: '', body: html.trim() });
+  } else {
+    const pre = html.substring(0, heads[0].start).trim();
+    if (pre) segs.push({ title: '', body: pre });
+    for (let i = 0; i < heads.length; i++) {
+      const end = i + 1 < heads.length ? heads[i + 1].start : html.length;
+      segs.push({ title: heads[i].title, body: html.substring(heads[i].end, end).trim() });
+    }
+  }
+  const out = [];
+  for (const s of segs) {
+    const t = s.title || '';
+    if (t === 'content' || t === '') {
+      if (out.length) out[out.length - 1].body += '\n' + s.body;
+      else out.push({ title: '', body: s.body });
+    } else {
+      out.push(s);
+    }
+  }
+  return out.map((s, idx) => s.title
+    ? { title: s.title, html: s.body }
+    : { intro: true, title: (idx === 0 ? '导读' : '续文'), html: s.body });
+}
+
 function countImgs(html) {
   const re = /src="([^"]*jimg[^"]*)"/g; let n = 0; while (re.exec(html)) n++;
   return n;
@@ -103,8 +149,9 @@ function countImgs(html) {
 
   for (const art of articles) {
     no++;
-    const raw = fs.readFileSync(path.join(SRC, art.slug + '-content.html'), 'utf8');
-    const parts = splitByH3(raw);
+    let raw = fs.readFileSync(path.join(SRC, art.slug + '-content.html'), 'utf8');
+    raw = raw.replace(/<h2[^>]*>\s*content\s*<\/h2>/gi, '');
+    const parts = art.split === 'h2' ? splitByH2(raw) : splitByH3(raw);
 
     // assemble questions
     const questions = [];

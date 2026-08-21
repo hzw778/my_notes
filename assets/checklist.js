@@ -21,7 +21,7 @@
     "mine-mianshi": "面试题收集",
     "mine-agent": "agent面经",
     "mine-qoder": "QODER笔记",
-    "mine-jishu": "技术派",
+    "mine-jishu": "paicil_技术派",
     docker: "Docker",
     claudecode: "ClaudeCode",
     es: "ElasticSearch",
@@ -102,7 +102,7 @@
     "mine-mianshi": "面试题收集（企业面经）",
     "mine-agent": "agent面经收集",
     "mine-qoder": "派聪明QORDER_NOTE",
-    "mine-jishu": "技术派·面试篇"
+    "mine-jishu": "paicil_技术派",
   };
   function mineScopeOf(title) {
     if (title.indexOf("技术派·") >= 0) return "jishu";
