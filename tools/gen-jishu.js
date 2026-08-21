@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SRC = 'C:/Users/86137/AppData/Local/Temp/paicoding_mianshi';
+const SRC = 'C:/Users/86137/AppData/Local/Temp/paicoding_full';
 const PROJ = path.join(__dirname, '..');
 const OUT = path.join(PROJ, 'assets', 'data-mine-jishu.js');
 const IMG_DIR = path.join(PROJ, 'assets', 'jimg');
