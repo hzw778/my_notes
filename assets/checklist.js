@@ -92,9 +92,11 @@
     ragjianli: "派聪明RAG简历（含面经收集）",
     qiyemianshi: "面试题收集（企业面经）",
     agentmianjing: "agent面经收集",
-    qoder: "派聪明QORDER_NOTE"
+    qoder: "派聪明QORDER_NOTE",
+    jishu: "技术派 · 面试篇"
   };
   function chapterScope(title) {
+    if (title.indexOf("技术派·") >= 0) return "jishu";
     if (title.indexOf("派聪明知识点") >= 0) return "paizi";
     if (title.indexOf("派聪明RAG简历") >= 0) return "ragjianli";
     if (title.indexOf("面试题收集") >= 0) return "qiyemianshi";

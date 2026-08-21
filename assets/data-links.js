@@ -8,7 +8,8 @@ window.LINKS = {
         { key: "mine", icon: "📓", title: "派聪明RAG简历（含面经收集）", token: "", status: "mine", scope: "ragjianli", note: "145 题 · PaiSmart 项目 / trae面试 / 6 组面经", local: true },
         { key: "mine", icon: "📚", title: "面试题收集（企业面经）", token: "", status: "mine", scope: "qiyemianshi", note: "139 题 · 长亮 / Spring / 网易 / 用友等", local: true },
         { key: "mine", icon: "🤖", title: "agent面经收集", token: "", status: "mine", scope: "agentmianjing", note: "30 题 · 哔哩AI / 联影 / 影石 / 小厂面经", local: true },
-        { key: "mine", icon: "🗂️", title: "派聪明QORDER_NOTE", token: "", status: "mine", scope: "qoder", note: "68 节 · RAG 项目 10 大模块 58 技术点 / 上传·解析·向量·Agent·安全·计费等", local: true }
+        { key: "mine", icon: "🗂️", title: "派聪明QORDER_NOTE", token: "", status: "mine", scope: "qoder", note: "68 节 · RAG 项目 10 大模块 58 技术点 / 上传·解析·向量·Agent·安全·计费等", local: true },
+        { key: "mine", icon: "🌊", title: "技术派", token: "", status: "mine", scope: "jishu", note: "66 题 · 腾讯/拼多多/腾讯面试官/携程/阿里/海康/长鑫 Agent 面试篇 · 含 117 张配图", local: true }
       ]
     },
     {
