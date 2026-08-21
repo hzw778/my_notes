@@ -80,26 +80,24 @@ function rewriteImgs(html) {
   });
 }
 
-// split article content by H3; header intro goes into a "导读" intro item
+// split article content by H3; each <h3> question's html = the content immediately after its
+// closing tag (its answer), up to the next <h3>. Any body before the first <h3> is a single 导读 intro.
 function splitByH3(html) {
-  // tokenize into blocks: <h3>...</h3> opens a new question
-  const parts = [];
+  const heads = [];
   const re = /<h3[^>]*>([\s\S]*?)<\/h3>/g;
-  let last = 0, m;
+  let m;
   while ((m = re.exec(html)) !== null) {
-    const title = m[1].replace(/<[^>]+>/g, '').trim();
-    const intro = html.substring(last, m.index).trim();
-    if (intro) parts.push({ intro: true, html: intro });
-    parts.push({ title: title, html: '' });
-    last = m.index + m[0].length;
+    heads.push({ title: m[1].replace(/<[^>]+>/g, '').trim(), start: m.index, end: m.index + m[0].length });
   }
-  const tail = html.substring(last).trim();
-  if (tail) {
-    // append tail to last question
-    if (parts.length) parts[parts.length - 1].html += '\n' + tail;
-    else parts.push({ intro: true, html: tail });
+  if (!heads.length) return [{ intro: true, html: html.trim() }];
+  const segs = [];
+  const pre = html.substring(0, heads[0].start).trim();
+  if (pre) segs.push({ intro: true, html: pre });
+  for (let i = 0; i < heads.length; i++) {
+    const end = i + 1 < heads.length ? heads[i + 1].start : html.length;
+    segs.push({ title: heads[i].title, html: html.substring(heads[i].end, end).trim() });
   }
-  return parts;
+  return segs;
 }
 
 // split teaching articles by H2; skip a placeholder heading whose text is "content"/empty,

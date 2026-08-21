@@ -265,15 +265,14 @@ for (int i = 0; i &lt; futures.size(); i++) {
 
   mine.chapters.push({
     "no": "2",
-    "title": "技术派·Memory与Context（26 题）",
+    "title": "技术派·Memory与Context（14 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王这次换了副金丝眼镜，像极了某个互联网大厂的 CTO，眼神犀利但嘴角带笑，看起来今天心情不错。</p>
 <p>老王翻了翻我的简历，“你这个 PaiCLI 写了三层记忆架构、RAG 向量检索、长上下文自适应，挺能吹的啊。”</p>
 <p>（内心 OS：王哥你别说吹，这些我一行一行码出来的😤）</p>
 <p>我说：“王哥，这几块确实是 PaiCLI 的核心。记忆系统做了三期，第 3 期做 Memory、第 4 期做 RAG 代码库理解、第 12 期做长上下文工程。最近还做了两个升级——长期记忆加了项目级隔离，代码检索从 RAG 一把梭改成了精确搜索优先、RAG 语义兜底。”</p>
 <p>老王露出感兴趣的表情：“行，那就从记忆系统开始聊。”</p>` },
-      { "t": "01、Agent 的记忆系统分哪几层", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“先说说整体架构，你们的记忆系统是怎么分层的？”</p>
+      { "t": "01、Agent 的记忆系统分哪几层", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“先说说整体架构，你们的记忆系统是怎么分层的？”</p>
 <p>我说：“三层。短期记忆、长期记忆、外部记忆。”</p>
 <p><img src="assets/jimg/1e4626397a789df80630d790a612f7b7.jpg" decoding="async" fetchpriority="high" width="3312" height="2482"></p>
 <p>短期记忆就是当前对话的消息历史——用户输入、模型回复、工具调用和结果，每一轮都在追加。生命周期是一次会话，关掉终端就没了。</p>
@@ -288,8 +287,7 @@ for (int i = 0; i &lt; futures.size(); i++) {
 <p>Agent 优先走精确搜索，只有查询太模糊、关键词难确定的时候才走 RAG。</p>
 <p>老王追问：“三层之间怎么协调？”</p>
 <p>我说：“有一个统一的管理者负责协调。每轮请求模型之前，它会做三件事：从长期记忆里检索相关条目，从外部记忆拿到检索结果，然后把这些和短期记忆里的对话历史一起拼装成完整的 prompt 发给模型。三层各司其职，管理者负责‘调度’。”</p>` },
-      { "t": "02、短期记忆会溢出吗", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“对话聊久了，短期记忆会不会撑爆上下文窗口？”</p>
+      { "t": "02、短期记忆会溢出吗", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“对话聊久了，短期记忆会不会撑爆上下文窗口？”</p>
 <p>我说：“会。”</p>
 <p>模型有上下文窗口限制，GLM-5.1 是 200k token，DeepSeek V4 是 1M。</p>
 <p>看起来很大，但对话历史不管理的话，几十轮下来就可能满了。特别是工具调用的结果——读一个大文件可能就是好几千 token，命令行输出如果不截断也是灾难级别的。</p>
@@ -310,8 +308,7 @@ for (int i = 0; i &lt; futures.size(); i++) {
 <p>关键是分割点必须落在 <code>user message</code> 边界，不能切断 <code>assistant tool_call</code> 和 <code>tool result</code> 的配对关系。否则 OpenAI-compatible API 会发现 tool_call_id 找不到对应 tool 消息，轻则模型理解混乱，重则直接 400。</p>
 <p><img src="assets/jimg/d7d62f23868af60e05b89f95278bfe4d.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3292" height="2398"></p>
 <p>（内心 OS：这个坑我踩过，第一版把所有历史都压缩了，模型回答前言不搭后语，调了一晚上才发现问题🥲）</p>` },
-      { "t": "03、长期记忆什么时候存、什么时候取", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王说：“聊聊长期记忆，什么时候存、什么时候取？”</p>
+      { "t": "03、长期记忆什么时候存、什么时候取", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王说：“聊聊长期记忆，什么时候存、什么时候取？”</p>
 <p>我说：“先说存。两条路径触发。”</p>
 <p>第一条是用户显式存，比如输入 <code>/save 这个项目用的是 Java 17</code>。</p>
 <p>第二条是 Agent 主动存，用户说“记一下以后用 Maven 不用 Gradle”，Agent 判断这是个稳定事实，调用 save_memory 工具自动存。</p>
@@ -332,8 +329,7 @@ for (int i = 0; i &lt; futures.size(); i++) {
 <p>检索用的是最朴素的关键词匹配，不是向量检索。</p>
 <p>因为长期记忆通常就几十条，关键词匹配够用且零依赖。如果记忆量到了几千条，就应该换成向量检索了。</p>
 <p>我们还新增了三个管理命令：<code>/memory list</code> 查看所有记忆，<code>/memory search</code> 按当前项目可见性搜索，<code>/memory delete</code> 删除单条。让用户能看到 Agent 到底记住了什么，心里有底。</p>` },
-      { "t": "04、什么是 RAG", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王话锋一转：“聊聊 RAG，先说说你的理解。”</p>
+      { "t": "04、什么是 RAG", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王话锋一转：“聊聊 RAG，先说说你的理解。”</p>
 <p>我说：“RAG 也就是检索增强生成。核心思路很简单，模型回答之前，先从外部知识库检索相关内容，把检索结果塞进 prompt 一起发给模型。”</p>
 <p><strong>Agent 为什么需要 RAG？</strong></p>
 <p>让 Agent“重构登录模块”，它不知道 LoginService 在哪个文件、有哪些方法、被谁调用。</p>
@@ -352,8 +348,7 @@ for (int i = 0; i &lt; futures.size(); i++) {
 <p>（内心 OS：说白了就是大炮打蚊子，精确匹配的活交给精确工具干😏）</p>
 <p>现在的策略是：精确符号、文件名、字符串定位优先走精确搜索，只有查询模糊、关键词难确定、或代码文档混合检索的场景才走 RAG。这个优先级写在 Agent 的系统提示词里，模型会自己判断用哪个工具。</p>
 <p><img src="assets/jimg/b5639cd4104834a44629985ebbd46c10.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3284" height="2682"></p>` },
-      { "t": "05、代码怎么分块", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“你刚才说‘按语法结构分块’，具体怎么做的？”</p>
+      { "t": "05、代码怎么分块", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“你刚才说‘按语法结构分块’，具体怎么做的？”</p>
 <p>我说：“分块是 RAG 的关键环节。分块太粗，一个文件里有 10 个方法但只有 1 个相关，检索出来夹带大量无关内容。分块太细，代码脱离上下文毫无意义。”</p>
 <p>PaiCLI 不是按固定行数切的，而是用 JavaParser 做 AST 解析，按语法结构切分。</p>
 <p>当前实现里有三种 chunk 类型：</p>
@@ -368,30 +363,26 @@ for (int i = 0; i &lt; futures.size(); i++) {
 <p><img src="assets/jimg/232b22d49fa7d20c237d6bdb71c870e7.jpg" decoding="async" loading="lazy" fetchpriority="low" width="4048" height="1974"></p>
 <p>老王又问：“Python 代码怎么办？”</p>
 <p>我说：“PaiCLI 当前只做了 Java 的 AST 分块，其他语言回退到文件级分块。要做通用多语言支持的话，可以用 tree-sitter，它支持几十种语言的语法解析。”</p>` },
-      { "t": "06、Embedding 是什么", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“向量化这步，Embedding 你给我解释一下。”</p>
+      { "t": "06、Embedding 是什么", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“向量化这步，Embedding 你给我解释一下。”</p>
 <p>我说：“Embedding 就是把文本映射到高维向量空间。两段语义相近的文本，映射出来的向量距离就近。”</p>
 <p><img src="assets/jimg/1822ad630e147013768245cd38067c6c.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3284" height="2274"></p>
 <p>举个例子。</p>
 <p>用户搜“处理用户登录的代码”，关键词匹配只能找到包含“用户”“登录”这些词的文件。但如果代码里写的是 <code>authenticate()</code> 和 <code>SessionManager</code>，一个都匹配不上。Embedding 能理解语义，“用户登录”和 authenticate + session 在向量空间里距离很近，检索就能命中。</p>
 <p>PaiCLI 用的 Embedding 模型是 nomic-embed-text，本地 Ollama 跑，免费但需要本机装 Ollama。生成的是 768 维的浮点数组，存到 SQLite 数据库里。</p>
 <p><img src="assets/jimg/2c798a2cd3ececb90e8663832bf4c7eb.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3252" height="2514"></p>` },
-      { "t": "07、向量检索用的什么算法", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“向量存进去了，检索的时候用什么算法？”</p>
+      { "t": "07、向量检索用的什么算法", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“向量存进去了，检索的时候用什么算法？”</p>
 <p>我说：“余弦相似度。公式是 <code>cos(A, B) = (A · B) / (|A| × |B|)</code>，就是两个向量的点积除以各自的模长，值域 -1 到 1，越接近 1 越相似。”</p>
 <p>老王追问：“<strong>为什么选余弦不选欧氏距离？</strong>”</p>
 <p>我说：“两个原因。第一，余弦只看方向不看大小，不受向量长度影响。两段代码的 Embedding 可能因为文本长度不同而模长差异很大，余弦不受干扰。第二，高维空间里欧氏距离有‘维度灾难’的问题，所有点的距离趋于相同，区分度下降，余弦更稳定。”</p>
 <p>PaiCLI 没有引入专门的向量数据库，就是在 SQLite 里存向量，检索时 Java 代码逐一算余弦相似度，排序取 Top-K。</p>
 <p>暴力检索复杂度是 O(n)，对于几千个代码块的中小型项目完全够用。如果代码库有几百万个块，就需要用 ANN 近似最近邻算法加速了——HNSW、IVF 这些，或者直接上 Milvus、Qdrant 之类的向量数据库。</p>
 <p><img src="assets/jimg/0f85d68c34949e4a4aa1ed57613cb224.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3948" height="2614"></p>` },
-      { "t": "08、代码关系图谱是什么", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“你简历上还写了个代码关系图谱，这跟 RAG 有什么关系？”</p>
+      { "t": "08、代码关系图谱是什么", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“你简历上还写了个代码关系图谱，这跟 RAG 有什么关系？”</p>
 <p>我说：“这两个是互补的。RAG 回答的是‘哪段代码和登录有关’，是语义检索。图谱回答的是‘LoginService 被谁调用了’‘UserController 依赖哪些类’，是结构查询。”</p>
 <p>PaiCLI 用 JavaParser 分析 AST，提取代码元素之间的五种结构关系：继承、接口实现、导入、方法调用、包含。</p>
 <p>这些关系存在 SQLite 里，用户输入 <code>/graph 类名</code> 就能看到完整的关系链。</p>
 <p><img src="assets/jimg/1ab853f52a23fbff295854d72bebde11.png" decoding="async" loading="lazy" fetchpriority="low" width="3920" height="1226"></p>` },
-      { "t": "09、长上下文模型出来后，RAG 还有必要吗", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王突然放了个大招：“现在 DeepSeek V4 都 1M 窗口了，RAG 还有存在的必要吗？”</p>
+      { "t": "09、长上下文模型出来后，RAG 还有必要吗", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王突然放了个大招：“现在 DeepSeek V4 都 1M 窗口了，RAG 还有存在的必要吗？”</p>
 <p>（内心 OS：经典高频面试题来了，稳住🤣）</p>
 <p>我说：“有必要，但角色变了。”</p>
 <p>第一是注意力精度。模型对长文本中间部分的信息关注度会下降，这就是 Lost in the Middle 问题。RAG 预先筛选出最相关的内容放在显眼位置，准确率更高。</p>
@@ -428,8 +419,7 @@ for (int i = 0; i &lt; futures.size(); i++) {
 <p>让 Agent 优先用 <code>grep_code</code> / <code>glob_files</code> / <code>read_file</code> 精确定位；只有用户描述很模糊、关键词难确定、普通搜索多轮无果，才调用 <code>search_code</code> 做语义辅助。</p>
 <p>最新版本还有个补充——RAG 不再是代码检索的唯一路径。Agent 拿到查询后，先用精确搜索工具做匹配，只有搞不定的模糊查询才走 RAG。所以即使没有提前建索引，Agent 依然能通过精确搜索理解代码库，RAG 变成了锦上添花而不是必须前置。</p>
 <p><img src="assets/jimg/67b8096f002612abb95e26c4ffbe26be.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3956" height="2214"></p>` },
-      { "t": "10、Prompt Caching 是什么", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问了一个成本相关的问题：“你们有做 Prompt Caching 吗？”</p>
+      { "t": "10、Prompt Caching 是什么", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问了一个成本相关的问题：“你们有做 Prompt Caching 吗？”</p>
 <p>我说：“做了，而且 Agent 场景天然适合 caching。”</p>
 <p>Prompt Caching 是模型提供商的服务端优化——如果连续请求的 prompt 前缀相同，服务端可以复用前缀缓存，跳过一部分重复计算。不同供应商的计费规则不一样，PaiCLI 不假设计费折扣，只负责识别和展示响应里的缓存命中 token。</p>
 <p>Agent 的请求模式完美契合这个机制。</p>
@@ -437,8 +427,7 @@ for (int i = 0; i &lt; futures.size(); i++) {
 <p>system prompt 每轮都一样，是完美的缓存前缀。对话历史是追加式的，新一轮请求等于旧请求加上新消息，大部分前缀都重复。</p>
 <p>PaiCLI 组装 prompt 的时候遵循“越稳定的内容越靠前”的原则：系统提示词、人格设定、模式指令这些稳定内容放前面，项目上下文、技能索引、记忆等动态内容放后面。这样更容易让 provider 的前缀缓存命中。</p>
 <p>DeepSeek 走 automatic prefix cache；GLM、Kimi、Step 也在 <code>LlmClient</code> 里声明了对应的 prompt cache mode。PaiCLI 会从 <code>cached_tokens</code>、<code>prompt_cache_hit_tokens</code>、<code>input_cache_hit_tokens</code> 等字段里解析缓存命中量，并在状态栏展示。</p>` },
-      { "t": "11、上下文压缩有哪些策略", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“除了你们用的 Map-Reduce 摘要法，还有其他压缩策略吗？”</p>
+      { "t": "11、上下文压缩有哪些策略", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问：“除了你们用的 Map-Reduce 摘要法，还有其他压缩策略吗？”</p>
 <p>我说：“主流的有三种。”</p>
 <p>第一种是截断法，最简单粗暴，直接丢弃最早的对话。</p>
 <p>第二种是摘要法，就是 PaiCLI 用的这种。用模型对早期对话生成摘要，用摘要替代原文。保留了语义，但摘要本身要消耗一次模型调用。</p>
@@ -464,8 +453,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 </code></pre>
 <p>这么做是为了避免切断 <code>assistant tool_call</code> 和 <code>tool result</code> 这种成对协议。否则很容易出现上一条 assistant 说要调用工具，但工具结果被截没了。</p>
 <p>一句话概括就是：<strong>PaiCLI 的压缩不是等模型报超限才处理，而是在每轮 LLM 请求前主动检查。</strong> 当前实现以 90% window 作为统一触发线。</p>` },
-      { "t": "12、对话历史的消息格式为什么要严格遵循协议", "tag": "技术派·Memory与Context", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问了一个看起来简单但坑很深的问题：“消息格式有什么讲究？”</p>
+      { "t": "12、对话历史的消息格式为什么要严格遵循协议", "tag": "技术派·Memory与Context", "p": "core", "html": `<p>老王问了一个看起来简单但坑很深的问题：“消息格式有什么讲究？”</p>
 <p>我说：“模型的聊天 API 对消息格式有严格要求。四种角色，system 是系统指令，user 是用户输入，assistant 是模型回复，可能带工具调用，tool 是工具返回结果，必须带 tool_call_id 和对应的工具调用匹配。”</p>
 <p>老王问：“不遵循会怎样？”</p>
 <p>我说：“直接报错或者模型理解混乱。tool 消息没有匹配的 tool_call_id？API 返回 400。assistant 和 user 顺序搞乱了？模型分不清谁说了什么。把工具结果塞进 user 消息？”</p>
@@ -496,10 +484,9 @@ assistant: 好的，我已了解之前的上下文，请继续。
 
   mine.chapters.push({
     "no": "3",
-    "title": "技术派·tool call 和 HITL（17 题）",
+    "title": "技术派·tool call 和 HITL（9 题）",
     "questions": [
-      { "t": "01、Function Calling 的原理是什么", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王开门见山：“很多人觉得大模型能‘调用工具’很神奇，你给我讲讲 Function Calling 到底是怎么回事。”</p>
+      { "t": "01、Function Calling 的原理是什么", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王开门见山：“很多人觉得大模型能‘调用工具’很神奇，你给我讲讲 Function Calling 到底是怎么回事。”</p>
 <p>Function Calling 是一个协议约定。</p>
 <p>客户端在请求里声明有哪些工具可以用，包括工具名、功能描述、参数的 JSON Schema。LLM 在生成响应的时候，如果判断当前任务需要工具辅助，它会在响应里输出一段 JSON，告诉客户端“我想调用这个工具，参数是这些”。然后客户端拿到这段 JSON，自己去执行对应的逻辑，把执行结果包装成 tool message 塞回对话历史，再请求一次 LLM，LLM 看到结果继续推理。</p>
 <p><img src="assets/jimg/a2f7b2303d10d568c9f95d9f4489218c.jpg" decoding="async" fetchpriority="high" width="2960" height="2830"></p>
@@ -510,8 +497,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <blockquote>
  <p><strong>为什么这样回答</strong>：面试官考这道题，核心是想看你有没有理解 Function Calling 的本质——LLM 不执行，只决策。很多候选人会答成“LLM 调用了工具”，这在语义上就不对。强调“写一段 JSON”和“执行权在客户端”这两个点，能让面试官确认你真的理解了机制，而不是只会用 API。</p>
 </blockquote>` },
-      { "t": "02、工具的 JSON Schema 怎么设计才能让 LLM 调用准确", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王继续问：“工具光有名字还不够，参数的 Schema 该怎么写？”</p>
+      { "t": "02、工具的 JSON Schema 怎么设计才能让 LLM 调用准确", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王继续问：“工具光有名字还不够，参数的 Schema 该怎么写？”</p>
 <p>我说：“有四个原则。”</p>
 <p><img src="assets/jimg/e74a765f4a9c8918d9eb98956294c43e.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3080" height="2350"></p>
 <p>第一，描述要具体。“读取指定路径的文件内容，返回文件的完整文本”比“读文件”好太多，LLM 是靠描述来理解工具用途的。</p>
@@ -521,8 +507,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <blockquote>
  <p><strong>为什么这样回答</strong>：这道题看起来是在聊 Schema 设计，其实面试官想听的是你对“LLM 靠文本理解工具”这个机制有多深的理解。</p>
 </blockquote>` },
-      { "t": "03、什么是 HITL，为什么 Agent 需要人工审批", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王话锋一转：“聊完工具本身，聊聊安全。HITL 这个东西你是怎么理解的？”</p>
+      { "t": "03、什么是 HITL，为什么 Agent 需要人工审批", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王话锋一转：“聊完工具本身，聊聊安全。HITL 这个东西你是怎么理解的？”</p>
 <p>我说：“HITL 全称 Human-in-the-Loop，中文叫人机协同。简单说就是 Agent 在执行高风险操作之前暂停下来，等人确认了再继续往下走。”</p>
 <p><img src="assets/jimg/dff1ec61873798992e1283f4bcf4a8ac.jpg" decoding="async" loading="lazy" fetchpriority="low" width="4048" height="2364"></p>
 <p>为什么需要它？</p>
@@ -531,14 +516,12 @@ assistant: 好的，我已了解之前的上下文，请继续。
  <li>第二，文件写入和命令执行是不可逆的，写错了文件内容，原来的就覆盖了。</li>
  <li>第三，生产环境需要审计，没有审批机制的 Agent 过不了安全合规审查。</li>
 </ul>` },
-      { "t": "04、HITL 的拦截层是怎么实现的", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王面露悦色：“思路不错，那实现呢？”</p>
+      { "t": "04、HITL 的拦截层是怎么实现的", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王面露悦色：“思路不错，那实现呢？”</p>
 <p>逻辑是这样的：每次工具调用进来，先看两个条件——HITL 是不是开着的，当前工具是不是在危险列表里。如果 HITL 没开或者工具没有危险，直接执行。</p>
 <p><img src="assets/jimg/dccae4f099e7a0927b6fe81f7b43fde4.jpg" decoding="async" loading="lazy" fetchpriority="low" width="2952" height="2834"></p>
 <p>如果需要审批，就构建一个审批请求，弹给用户。</p>
 <p>用户可以选五种操作：APPROVED 批准、APPROVED_ALL 全部放行同类工具、REJECTED 拒绝并说明原因、MODIFIED 修改参数后再执行、SKIPPED 跳过本步骤。</p>` },
-      { "t": "05、web_search 和 web_fetch 怎么分工", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王话题一转：“你们有联网工具，搜索和抓取是怎么分的？”</p>
+      { "t": "05、web_search 和 web_fetch 怎么分工", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王话题一转：“你们有联网工具，搜索和抓取是怎么分的？”</p>
 <p>我说：“web_search 负责搜索引擎查询，返回的是结构化结果——标题、摘要、URL。背后对接了三个搜索引擎：智谱 Web Search 是默认的，SerpAPI 和 SearXNG 可选的。web_fetch 负责抓取一个已知 URL 的页面内容，用 Jsoup 做正文提取，返回干净的 Markdown 格式文本。”</p>
 <p><img src="assets/jimg/sucai-20260427142551.png" decoding="async" loading="lazy" fetchpriority="low" width="3796" height="2194"></p>
 <p>老王追问：“联网工具的安全策略怎么做？”</p>
@@ -547,8 +530,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <blockquote>
  <p><strong>为什么这样回答</strong>：两个工具的分工是基础题，关键在安全策略的追问。SSRF 是 Web 安全的常见攻击面，答出“屏蔽内网地址段”和“禁止 file 协议”说明你对这个攻击模式有认知。</p>
 </blockquote>` },
-      { "t": "06、web_fetch 拿不到内容怎么办", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王紧接着问：“web_fetch 碰到 SPA 或者防爬站点呢？”</p>
+      { "t": "06、web_fetch 拿不到内容怎么办", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王紧接着问：“web_fetch 碰到 SPA 或者防爬站点呢？”</p>
 <p>我说：“SPA 是 JavaScript 动态渲染的，Jsoup 只能解析静态 HTML，拿不到渲染后的 DOM。微信公众号、知乎、小红书这些防爬站点也一样，返回不了实际内容。”</p>
 <p>PaiCLI 的解决思路不是在代码里写 fallback 逻辑，而是通过 system prompt 里的工具选择决策表引导 LLM 自己判断。</p>
 <p>LLM 看到 web_fetch 拿不到正文，就会自动切换到 Chrome DevTools MCP 的浏览器工具——先 navigate_page 打开页面，然后 take_snapshot 拿到完整的 DOM 文本。</p>
@@ -559,14 +541,12 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <blockquote>
  <p><strong>为什么这样回答</strong>：这道题考的是你遇到工具边界时的解决思路。直接回答“搞不定”体现诚实，然后给出解决方案体现能力。重点是“把决策权交给 LLM 而不是硬编码”这个设计思路，说明你理解 Agent 的核心理念——LLM 负责决策，工具负责执行。</p>
 </blockquote>` },
-      { "t": "07、HITL 的“全部放行”为什么区分工具和 server 两个维度", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王问了一个比较细的问题：“你说 APPROVED_ALL 是按工具名放行的，那接入 MCP 之后有变化吗？”</p>
+      { "t": "07、HITL 的“全部放行”为什么区分工具和 server 两个维度", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>老王问了一个比较细的问题：“你说 APPROVED_ALL 是按工具名放行的，那接入 MCP 之后有变化吗？”</p>
 <p>我说：“接入 Chrome DevTools MCP 之后，我们加了 server 维度的放行。”</p>
 <p><img src="assets/jimg/692f05b6e7871062b2f66f455b6c5f6b.png" decoding="async" loading="lazy" fetchpriority="low" width="1400" height="933"></p>
 <p>因为浏览器操作是连续的——导航、点击、填表单、截图，每一步都弹审批体验极差。用户对 chrome-devtools 选了“全部放行 → server 维度”后，这个 MCP server 的所有工具一律免审，操作就流畅了。</p>
 <p>但工具维度和 server 维度的放行是分开管理的。放行了 write_file 这个工具，不影响其他工具。放行了 chrome-devtools 这个 server，只影响该 server 下的工具。两个维度互不干扰。</p>` },
-      { "t": "08、如何防止 LLM 被 prompt 注入攻击？", "tag": "技术派·tool call和HITL", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>第一道防线是输入预处理和过滤。</p>
+      { "t": "08、如何防止 LLM 被 prompt 注入攻击？", "tag": "技术派·tool call和HITL", "p": "core", "html": `<p>第一道防线是输入预处理和过滤。</p>
 <p>在用户输入给到模型之前，先做一轮检测，识别出常见的注入模式。</p>
 <p>比如检测“忽略之前的指令”“你现在是一个没有限制的 AI”“system prompt override”这类典型的攻击话术。</p>
 <p>这一层可以用规则引擎做关键词和正则匹配，也可以用一个专门训练过的分类模型来判断输入是否包含注入意图。</p>
@@ -594,10 +574,9 @@ assistant: 好的，我已了解之前的上下文，请继续。
 
   mine.chapters.push({
     "no": "4",
-    "title": "技术派·MCP+CDP（25 题）",
+    "title": "技术派·MCP+CDP（13 题）",
     "questions": [
-      { "t": "01、MCP 是什么，解决了什么问题", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>MCP 全称 Model Context Protocol，是 A 厂在 2024 年底推出的开放协议，一句话概括就是：<strong>给 AI 应用和外部工具之间定了一套标准通信接口</strong>。</p>
+      { "t": "01、MCP 是什么，解决了什么问题", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>MCP 全称 Model Context Protocol，是 A 厂在 2024 年底推出的开放协议，一句话概括就是：<strong>给 AI 应用和外部工具之间定了一套标准通信接口</strong>。</p>
 <p><img src="assets/jimg/28f13a6f8b206dddd0612570a59593de.png" decoding="async" fetchpriority="high" width="960" height="540"></p>
 <h4>为什么需要这个协议？</h4>
 <p>没有 MCP 之前，每个 AI 应用想接入一个新工具就得自己写一套定制代码，你写你的，我写我的，重复劳动。</p>
@@ -609,16 +588,14 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <p><strong>工具发现</strong>——Host 启动 MCP Server 后，调一次 tools/list 就知道这个 Server 能干啥，不用提前硬编码。</p>
 <p><strong>工具调用</strong>——统一走 tools/call 接口，不管底层是 Git 操作、浏览器操控还是数据库查询，调用方式一模一样，对 Agent 来说完全无感。</p>
 <p><strong>数据访问</strong>——resources/list 加 resources/read 让 Server 暴露可读取的数据源，LLM 需要上下文的时候直接拿。</p>` },
-      { "t": "02、MCP 的 stdio 传输和 Streamable HTTP 传输有什么区别", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>stdio 就是标准输入输出。Host 把 MCP Server 当子进程启动，通过 stdin 发 JSON-RPC 消息，stdout 接收响应。Server 的生命周期完全由 Host 控制——Host 一退出，stdin 就 EOF 了，Server 跟着结束。</p>
+      { "t": "02、MCP 的 stdio 传输和 Streamable HTTP 传输有什么区别", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>stdio 就是标准输入输出。Host 把 MCP Server 当子进程启动，通过 stdin 发 JSON-RPC 消息，stdout 接收响应。Server 的生命周期完全由 Host 控制——Host 一退出，stdin 就 EOF 了，Server 跟着结束。</p>
 <p>适合本地工具，比如 chrome-devtools-mcp、mcp-server-git 这些。</p>
 <p><img src="assets/jimg/3cc1398e75e759380aa9c58dc446e1be.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3212" height="2566"></p>
 <p>Streamable HTTP 走的是网络。Host 通过 HTTP POST 发 JSON-RPC 请求，Server 用 SSE 流式返回响应。Server 是独立部署的远程服务，跟 Host 没有生死绑定，你关了客户端，Server 还活着。</p>
 <p>适合云端工具、团队共享的 MCP Server。</p>
 <p>配置文件里怎么区分？也简单，有 command 字段就走 stdio，有 url 字段就走 HTTP，PaiCLI 自己判断。</p>
 <p><img src="assets/jimg/68c1df6fc1a320e6a8a1e982f1a9aa53.png" decoding="async" loading="lazy" fetchpriority="low" width="3284" height="2322"></p>` },
-      { "t": "03、MCP 的 JSON-RPC 通信协议是怎么工作的", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>用的是 JSON-RPC 2.0，消息就三种。</p>
+      { "t": "03、MCP 的 JSON-RPC 通信协议是怎么工作的", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>用的是 JSON-RPC 2.0，消息就三种。</p>
 <p><img src="assets/jimg/e6847fd2689154529645dfdef2b79953.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3288" height="2914"></p>
 <p>**Request，**带 id，需要对方响应。比如 tools/list 请求，id 是 1，Host 发出去之后等 Server 返回 id 同样是 1 的 Response。</p>
 <p>**Response，**id 和 Request 配对。Server 收到 id 为 1 的请求，处理完了原样回一个 id 为 1 的响应，Host 拿着 id 一对，就知道这是哪个请求的结果了。</p>
@@ -632,8 +609,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <blockquote>
  <p><strong>为什么这样回答</strong>：JSON-RPC 本身不难，面试官考的是你有没有自己写过。提到 ConcurrentHashMap + CompletableFuture 做请求-响应配对，就说明你不是只会调 SDK，而是真正摸过底层通信。</p>
 </blockquote>` },
-      { "t": "04、MCP 工具注册到 Agent 后，命名空间怎么设计的", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>PaiCLI 给每个 MCP 工具注册的时候，用的是 <code>mcp__server名__tool名</code> 这种格式。比如 chrome-devtools 这个 Server 的 navigate_page 工具，注册完就叫 <code>mcp__chrome-devtools__navigate_page</code>。</p>
+      { "t": "04、MCP 工具注册到 Agent 后，命名空间怎么设计的", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>PaiCLI 给每个 MCP 工具注册的时候，用的是 <code>mcp__server名__tool名</code> 这种格式。比如 chrome-devtools 这个 Server 的 navigate_page 工具，注册完就叫 <code>mcp__chrome-devtools__navigate_page</code>。</p>
 <p><img src="assets/jimg/830c4515516d5744f240a24919a89f79.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3228" height="2838"></p>
 <h4>为什么用双下划线</h4>
 <p>因为工具名本身就带单下划线，像 navigate_page、take_screenshot。</p>
@@ -644,56 +620,48 @@ assistant: 好的，我已了解之前的上下文，请继续。
  <li><strong>安全隔离</strong>，审批策略可以按前缀做，比如用户说"放行整个 chrome-devtools"，匹配前缀即可。</li>
  <li><strong>LLM 可理解</strong>，LLM 看到 mcp__chrome-devtools__navigate_page，直接就能判断这是浏览器相关操作。</li>
 </ul>` },
-      { "t": "05、MCP 的 resources 是什么，和 tools 有什么区别", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>简单说，Tools 是<strong>能干活的</strong>，有输入参数、会改变状态；Resources 是<strong>能读的</strong>，通过 URI 访问，返回内容，只读不写。你可以把 Tools 理解成 POST 端点，Resources 理解成 GET 端点。</p>
+      { "t": "05、MCP 的 resources 是什么，和 tools 有什么区别", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>简单说，Tools 是<strong>能干活的</strong>，有输入参数、会改变状态；Resources 是<strong>能读的</strong>，通过 URI 访问，返回内容，只读不写。你可以把 Tools 理解成 POST 端点，Resources 理解成 GET 端点。</p>
 <p>但实际使用中有个问题：LLM 不能直接调 resources/read，因为 Function Calling 协议里只有 tools 的概念，没有 resources。</p>
 <p><img src="assets/jimg/5e36a638fac8f228bd5d334dd08b6dec.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3116" height="3058"></p>
 <p>所以 PaiCLI 做了两件事来填这个坑。</p>
 <p>一是<strong>把 resources 包装成工具</strong>。给每个支持 resources 的 Server 自动注册两个虚拟工具——list_resources 和 read_resource。LLM 可以像调普通工具一样调用它们，先查有哪些资源，再按 URI 读取内容。</p>
 <p>二是<strong>支持用户直接 @ 指定</strong>。用户在输入里写 <code>@server:protocol://path</code>，PaiCLI 在提交给 Agent 之前自动把资源内容展开塞进去，不经过 LLM 决策。</p>
 <p>两种方式各有适用场景：LLM 需要主动探索数据的时候走工具，用户已经知道要读什么资源的时候直接 @ 指定。</p>` },
-      { "t": "06、MCP Server 启动失败或超时怎么处理", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>这个问题实际开发中真的经常遇到，PaiCLI 做了好几层兜底。</p>
+      { "t": "06、MCP Server 启动失败或超时怎么处理", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>这个问题实际开发中真的经常遇到，PaiCLI 做了好几层兜底。</p>
 <p>首先，initialize 设了 60 秒超时，不能让一个 Server 卡住把整个 Agent 的启动流程都堵了。</p>
 <p>然后，多个 Server 是并行启动的，后台线程各干各的，不会互相等。</p>
 <p>启动期间每 5 秒打印一次等待状态，告诉用户"某某 Server 还没就绪"，别让人干等着不知道发生了什么。</p>
 <p>最后还有个 <code>/mcp restart</code> 命令，某个 Server 挂了可以单独重启，不用全部重来。</p>
 <p><img src="assets/jimg/paicli-interview-mcp-20260525184754.png" decoding="async" loading="lazy" fetchpriority="low" width="3528" height="1910"></p>` },
-      { "t": "07、Chrome DevTools MCP 能干什么，和 web_fetch 怎么分工", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>Chrome DevTools MCP 是 Google 官方出的 MCP Server，一口气提供了 28 个浏览器操作工具。干嘛用的？就是让 LLM 能像真人一样操作浏览器——打开网页、填表单、点按钮、截图、抓网络请求，你能干的它都能干。</p>
+      { "t": "07、Chrome DevTools MCP 能干什么，和 web_fetch 怎么分工", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>Chrome DevTools MCP 是 Google 官方出的 MCP Server，一口气提供了 28 个浏览器操作工具。干嘛用的？就是让 LLM 能像真人一样操作浏览器——打开网页、填表单、点按钮、截图、抓网络请求，你能干的它都能干。</p>
 <p><img src="assets/jimg/b4323294652a20a87665cff4db4581b6.png" decoding="async" loading="lazy" fetchpriority="low" width="2180" height="1370"></p>
 <h4>已经有 web_fetch 了，为什么还要Chrome DevTools MCP</h4>
 <p>web_fetch 本质就是一个 HTTP 请求，只能拿到静态 HTML。碰到 SPA、JS 渲染的页面、有防爬的站点，就彻底抓瞎了。浏览器 MCP 不一样，它是真正跑了一个 Chrome 实例，JavaScript 照跑，登录态照保，什么页面都拿得到。</p>
 <p>PaiCLI 在 system prompt 里有一张决策表，LLM 会根据任务特征自己判断走哪条路：静态页面走 web_fetch，便宜又快；SPA 和 JS 渲染走浏览器的 take_snapshot；防爬站点也走浏览器；需要登录的页面走浏览器加 CDP 会话复用；需要填表提交的走 fill_form + click。</p>` },
-      { "t": "08、CDP 会话复用是怎么实现的", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>Chrome DevTools MCP 默认是 isolated 模式，每次启动都创建一个全新的浏览器 profile，没有任何登录态。</p>
+      { "t": "08、CDP 会话复用是怎么实现的", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>Chrome DevTools MCP 默认是 isolated 模式，每次启动都创建一个全新的浏览器 profile，没有任何登录态。</p>
 <p><img src="assets/jimg/2c7214f0d07a853cb68e34d79a916ea4.jpg" decoding="async" loading="lazy" fetchpriority="low" width="3316" height="2390"></p>
 <p>所以 PaiCLI 做了 CDP（Chrome DevTools Protocol）会话复用。</p>
 <p>流程是这样的：用户在自己的 Chrome 里正常登录各种网站，然后在 PaiCLI 里执行 <code>/browser connect</code>，把 MCP 从 isolated 模式切到 autoConnect 模式。MCP Server 连接到用户已有的 Chrome 实例，复用全部登录态。这样 Agent 就能直接访问已登录的页面了。</p>` },
-      { "t": "09、MCP 的通知机制有几种？", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>三种：<strong>tools/list_changed</strong> 工具列表变了、<strong>resources/list_changed</strong> 资源列表变了、<strong>resources/updated</strong> 某个资源的内容更新了。</p>
+      { "t": "09、MCP 的通知机制有几种？", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>三种：<strong>tools/list_changed</strong> 工具列表变了、<strong>resources/list_changed</strong> 资源列表变了、<strong>resources/updated</strong> 某个资源的内容更新了。</p>
 <p>PaiCLI 收到 tools/list_changed 就自动重新拉取工具列表，收到 resources 相关的通知就清掉对应缓存，保持数据新鲜。</p>
 <h4>通知的 handler 为什么要异步执行</h4>
 <p>如果通知处理逻辑直接跑在消息读取线程里，处理逻辑内部要是发了一个 JSON-RPC 请求并等响应，就会死锁。</p>
 <p>因为读取线程被占着，新的响应进了缓冲区但没人读，等待的响应永远读不到。典型场景就是 Server 推送 tools/list_changed，处理逻辑要调 tools/list 重新拉工具列表，结果自己等自己，死锁了。</p>
 <p>所以 PaiCLI 用一个独立的单线程做异步派发，通知处理和消息读取完全隔离，彻底避免了这个问题。</p>
 <p><img src="assets/jimg/paicli-interview-mcp-20260525185650.png" decoding="async" loading="lazy" fetchpriority="low" width="3188" height="2826"></p>` },
-      { "t": "10、MCP 的 tools/call 返回结果怎么处理", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>tools/call 返回的是一个 content 数组，每个元素有 type 字段，主要三种：text、image、resource。</p>
+      { "t": "10、MCP 的 tools/call 返回结果怎么处理", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>tools/call 返回的是一个 content 数组，每个元素有 type 字段，主要三种：text、image、resource。</p>
 <p>text 最简单，直接拼成字符串当 tool message 返回给 LLM 就行。</p>
 <p>image 类型稍微复杂一些。先解码 base64，处理成功就生成图片附件，下一轮对话里发给 LLM。如果处理失败了，比如图片太大或者格式不支持，就降级为文本提示，告诉 LLM 用 take_snapshot 获取 DOM 文本快照。</p>
 <p>resource 类型就是提取文本内容，拼到 text 结果里一起返回。</p>
 <p>如果工具执行失败了，isError 为 true，整个结果会包装成"MCP 工具返回错误"的格式，LLM 看到后知道调用失败了，可以决定重试还是换个思路。</p>` },
-      { "t": "11、MCP 和 Function Calling 有什么关系", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>这俩经常被搞混，但其实分工很清楚。</p>
+      { "t": "11、MCP 和 Function Calling 有什么关系", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>这俩经常被搞混，但其实分工很清楚。</p>
 <p>Function Calling 是 LLM API 层的协议，干两件事：告诉 LLM"你有哪些工具能用"，以及让 LLM 说"我要调这个工具"。</p>
 <p>MCP 是工具提供方的协议，解决的是"工具从哪来、长什么样、怎么执行"。</p>
 <p><img src="assets/jimg/paicli-interview-mcp-20260525190320.png" decoding="async" loading="lazy" fetchpriority="low" width="3228" height="3174"></p>
 <p>串起来看就清楚了：MCP Server 通过 tools/list 返回工具定义 → PaiCLI 把这些定义转成 Function Calling 格式 → 塞进 LLM 请求的 tools 字段 → LLM 返回 tool_calls 说"我要调某个 MCP 工具" → PaiCLI 通过 MCP 的 tools/call 去执行 → 结果再喂回给 LLM。</p>
 <p><img src="assets/jimg/paicli-interview-mcp-20260525190446.png" decoding="async" loading="lazy" fetchpriority="low" width="4036" height="2330"></p>
 <p>一句话总结：<strong>MCP 管"工具从哪来"，Function Calling 管"LLM 怎么选"</strong>。两个协议各管一段，合在一起才是完整的工具调用链路。</p>` },
-      { "t": "12、MCP 的 schema 清洗是什么，为什么需要", "tag": "技术派·MCP+CDP", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>MCP Server 返回的工具参数是标准 JSON Schema，但 LLM 不是 JSON Schema 解析器，有些复杂结构它处理不好。</p>
+      { "t": "12、MCP 的 schema 清洗是什么，为什么需要", "tag": "技术派·MCP+CDP", "p": "core", "html": `<p>MCP Server 返回的工具参数是标准 JSON Schema，但 LLM 不是 JSON Schema 解析器，有些复杂结构它处理不好。</p>
 <p>典型的有三个问题：</p>
 <ul>
  <li><strong><code>$ref</code> 引用</strong>，JSON Schema 允许用 <code>$ref</code> 指向别处的定义，但 LLM 不会去"查字典"，看到 <code>$ref</code> 就懵了，生成的参数大概率对不上。</li>
@@ -918,10 +886,9 @@ assistant: 好的，我已了解之前的上下文，请继续。
 
   mine.chapters.push({
     "no": "6",
-    "title": "技术派·TUI、LSP、Git、Runtime API（25 题）",
+    "title": "技术派·TUI、LSP、Git、Runtime API（13 题）",
     "questions": [
-      { "t": "01、Agent CLI 的终端渲染有哪些方案", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>三种。</p>
+      { "t": "01、Agent CLI 的终端渲染有哪些方案", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>三种。</p>
 <p>第一种是纯文本输出。</p>
 <p>直接 print。好的地方是兼容性最强，任何终端都能正常显示。不好的地方也很明显，没有颜色、没有折叠、没有状态栏，信息密度低，用户体验差。</p>
 <p>第二种是 Inline 流式输出，也是 PaiCLI 的默认方案。底部固定一个状态栏，显示当前模型、token 用量、上下文窗口占比、运行耗时。</p>
@@ -929,8 +896,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <p><img src="assets/jimg/paicli-interview-productization-20260529075735.png" decoding="async" fetchpriority="high" width="3520" height="1790"></p>
 <p>第三种是全屏 TUI。独占整个终端窗口，可以做文件树、分栏布局、弹窗。用户体验最丰富，但需要全屏模式。PaiCLI 基于 Lanterna 库实现了这个方案，有对话区、状态栏和模态弹窗做审批确认。</p>
 <p>最终我们选择了 Inline 作为默认的交互方式，因为它在信息密度和用户体验之间达到了一个不错的平衡。比较接近Claude Code和Qoder CLI的交互方式。</p>` },
-      { "t": "02、DECSTBM 是什么？状态栏怎么实现的", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>DECSTBM 全称是 DEC Set Top and Bottom Margins，是 VT100 终端定义的转义序列，用来设置终端的滚动区域。</p>
+      { "t": "02、DECSTBM 是什么？状态栏怎么实现的", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>DECSTBM 全称是 DEC Set Top and Bottom Margins，是 VT100 终端定义的转义序列，用来设置终端的滚动区域。</p>
 <p>可以通过一条 <code>ESC[1;{n}r</code> 指令，告诉终端只有第 1 行到第 n 行参与滚动，剩下的行保持不动。</p>
 <p><img src="assets/jimg/paicli-interview-productization-20260529080844.png" decoding="async" loading="lazy" fetchpriority="low" width="3576" height="1674"></p>
 <p>PaiCLI 的做法是把终端底部留出 2 行不参与滚动。主内容在上方正常滚动输出，底部 2 行始终固定显示状态信息。</p>
@@ -941,16 +907,14 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <h4>状态栏的更新频率怎么控制</h4>
 <p>状态栏的更新由调用方驱动，通常在每次收到 token 或者每个 Agent 迭代周期触发一次。</p>
 <p>渲染器内部可以根据需要做节流处理，避免高频重绘带来的终端闪烁。</p>` },
-      { "t": "03、LSP 诊断注入是什么？对 Agent 有什么价值", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“Agent 改了代码，编译出错了怎么办？”</p>
+      { "t": "03、LSP 诊断注入是什么？对 Agent 有什么价值", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“Agent 改了代码，编译出错了怎么办？”</p>
 <p>PaiCLI 的 LSP 诊断注入就是解决这个问题的。</p>
 <p>整个流程是这样的：Agent 执行文件写入操作后，系统的 edit hook 会自动触发。</p>
 <p>诊断模块对修改过的文件会做语法分析，收集错误和警告信息，然后把诊断结果格式化成结构化文本，在下一轮 LLM 请求之前作为合成消息注入上下文。LLM 看到编译错误的具体位置和描述，就能在下一轮回复中自动修复。</p>
 <p>当前的 MVP 版本对 Java 文件使用了 JavaParser 做轻量语法诊断。诊断结果的格式化也有讲究，每条诊断都包含错误等级、文件路径、行号、列号和具体信息，比如 <code>[error] Foo.java:42:15 缺少分号 (javaparser)</code>。LLM 拿到这种格式，能精确定位到具体的代码行，直接修复。</p>
 <p><img src="assets/jimg/paicli-interview-productization-20260529081718.png" decoding="async" loading="lazy" fetchpriority="low" width="3688" height="2510"></p>
 <p>这样做的好处是，Agent 不用等用户手动编译就能发现编译错误并自动修复，实现了编辑、诊断、修复的自动循环。</p>` },
-      { "t": "04、Git Side-History 快照是怎么工作的", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“Agent 把文件改坏了，怎么回滚？”</p>
+      { "t": "04、Git Side-History 快照是怎么工作的", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“Agent 把文件改坏了，怎么回滚？”</p>
 <p>Agent 改文件是有风险的，所以快照和回滚机制是必须做的。</p>
 <p>用户项目本来就有 git，Agent 每次改完文件 commit 一下不就行了？</p>
 <p>不行，有三个原因。</p>
@@ -972,8 +936,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <p>当用户执行 <code>/restore &lt;N&gt;</code> 命令，就能从第 N 个推理前快照恢复文件到工作区。恢复的过程是把快照中的文件内容写回工作区，用户的 <code>.git</code> 完全没影响。</p>
 <h4>快照的提交身份是什么</h4>
 <p>所有快照的提交者信息统一为 <code>PaiCLI Snapshot &lt;snapshot@paicli.local&gt;</code>，和用户的 git 身份完全隔离。</p>` },
-      { "t": "05、快照恢复会影响用户的 .git 吗", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“恢复操作安全吗？会不会搞乱用户自己的 git 状态？”</p>
+      { "t": "05、快照恢复会影响用户的 .git 吗", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“恢复操作安全吗？会不会搞乱用户自己的 git 状态？”</p>
 <p>不会。</p>
 <p>Side-git 仓库和用户的 <code>.git</code> 是完全独立的两套系统。恢复操作只做一件事：把快照中的文件内容写回工作区。用户的 <code>.git</code> 目录、暂存区、分支信息全部不动。</p>
 <p>恢复完之后，<code>git status</code> 会显示文件被修改了，这些修改和用户手动编辑文件的效果完全一样。用户可以选择 commit 保留这些改动，也可以 discard 放弃，主动权完全在用户手里。</p>
@@ -982,8 +945,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <p>用户恢复到某一轮推理之前的状态，万一恢复错了怎么办？</p>
 <p>因为恢复操作之前自动拍了一个恢复前快照，所以可以再恢复回来。</p>
 <p>恢复过程还会返回一个结果对象，告诉用户哪些文件被恢复了、哪些文件被删除了（因为这些文件在快照中不存在）。信息透明，用户清楚地知道恢复操作改动了什么。</p>` },
-      { "t": "06、异步后台任务是怎么设计的", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“Agent 执行一个大任务，比如重构整个模块，用户需要一直等着吗？”</p>
+      { "t": "06、异步后台任务是怎么设计的", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“Agent 执行一个大任务，比如重构整个模块，用户需要一直等着吗？”</p>
 <p>不需要。</p>
 <p>PaiCLI 有一套后台任务系统，用户通过 <code>/task add "增加一个hello 二哥"</code> 提交任务后就可以做其他事情了。</p>
 <p><img src="assets/jimg/paicli-interview-productization-20260529082514.png" decoding="async" loading="lazy" fetchpriority="low" width="3544" height="2634"></p>
@@ -996,8 +958,7 @@ assistant: 好的，我已了解之前的上下文，请继续。
 <h4>任务执行失败了怎么处理</h4>
 <p>worker 捕获到异常后，把任务状态标记为 failed，错误信息写入数据库。</p>
 <p>用户通过 <code>/task log &lt;id&gt;</code> 可以查看具体的执行摘要和错误详情。如果是线程中断（比如用户手动取消），状态标记为 canceled。无论哪种情况，worker 都会继续处理队列中的下一个任务，不会因为一个任务失败导致整个系统停摆。</p>` },
-      { "t": "07、PaiCLI 不就是个命令行工具吗？为什么还需要 HTTP API？", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>加了 HTTP API 之后，PaiCLI 就变成了一个可编程的 Agent 引擎。CI/CD 流水线可以调用 PaiCLI 做自动代码审查或测试生成，IDE 插件可以通过 HTTP 接口集成 Agent 能力，Web 面板可以用浏览器替代终端做交互。</p>
+      { "t": "07、PaiCLI 不就是个命令行工具吗？为什么还需要 HTTP API？", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>加了 HTTP API 之后，PaiCLI 就变成了一个可编程的 Agent 引擎。CI/CD 流水线可以调用 PaiCLI 做自动代码审查或测试生成，IDE 插件可以通过 HTTP 接口集成 Agent 能力，Web 面板可以用浏览器替代终端做交互。</p>
 <p>核心有三个端点：</p>
 <ul>
  <li><code>POST /v1/threads</code> 创建对话线程，</li>
@@ -1044,8 +1005,7 @@ curl http://127.0.0.1:8080/v1/threads/thread_0c25b7d80f8f/events \\
 <p>第三层，基于 JDK 内置的 HttpServer 实现，不引入 Netty、不引入 Spring Web，零额外依赖，减少了潜在的安全漏洞面。</p>
 <p>线程和事件数据也做了持久化，存储在 <code>~/.paicli/runtime/runtime.db</code> 的 SQLite 数据库中。</p>
 <p>事件表按 thread_id 和自增 id 建了联合索引，SSE 端点支持 <code>?after=&lt;lastId&gt;</code> 参数做增量拉取，客户端断线重连后不会丢失事件。</p>` },
-      { "t": "08、Agent 只能处理文本吗？图片能传进来吗？", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>可以。</p>
+      { "t": "08、Agent 只能处理文本吗？图片能传进来吗？", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>可以。</p>
 <p>用户贴一张截图，PaiCLI可以识别出图片内容。</p>
 <p><img src="assets/jimg/paicli-interview-productization-20260529085047.png" decoding="async" loading="lazy" fetchpriority="low" width="3560" height="2862"></p>
 <p>这是原图。</p>
@@ -1058,8 +1018,7 @@ curl http://127.0.0.1:8080/v1/threads/thread_0c25b7d80f8f/events \\
 <p>先检查文件大小是否超过 50MB 的输入上限，然后判断 base64 编码后是否超过 5MB 的 API 限制。如果不超限且没有透明通道，直接使用原始数据。如果有透明通道，先把背景统一填充为白色再编码，因为不同模型对 alpha 通道的处理不一致。如果超过大小限制，先按比例缩放到 2000x2000 以内，然后尝试 PNG 无损编码。如果 PNG 仍然超限，就逐级降低 JPEG 质量（从 0.85 到 0.25 共五档），直到文件大小满足要求。</p>
 <h4>如果图片缩放了，坐标映射怎么处理</h4>
 <p>压缩后的元信息里会标注原始尺寸和显示尺寸的比例关系，比如“坐标乘以 2.00 可映射回原始图片”。如果 Agent 需要对图片中的特定位置做标注或定位，可以根据这个比例换算回原始坐标。</p>` },
-      { "t": "09、Renderer 接口抽象的设计思路是什么", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“有几种渲染方案，Agent 核心逻辑怎么和渲染解耦的？”</p>
+      { "t": "09、Renderer 接口抽象的设计思路是什么", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“有几种渲染方案，Agent 核心逻辑怎么和渲染解耦的？”</p>
 <p>经典的策略模式。</p>
 <p>PaiCLI 定义了一个统一的 Renderer 接口，所有渲染相关的操作都会到这个接口上。</p>
 <p><img src="assets/jimg/paicli-interview-productization-20260529085928.png" decoding="async" loading="lazy" fetchpriority="low" width="2444" height="1326"></p>
@@ -1076,24 +1035,21 @@ curl http://127.0.0.1:8080/v1/threads/thread_0c25b7d80f8f/events \\
 <p>Inline 模式用 ANSI 颜色和折叠块渲染工具调用，用行内 diff 渲染文件对比，用底部状态栏显示状态，用终端提示做审批。</p>
 <p>全屏 TUI 把工具调用输出到对话区面板，diff 用系统消息展示，审批用模态弹窗（通过 CountDownLatch 做跨线程同步）。</p>
 <p>纯文本模式就是 println，按工具名分组展示调用摘要，审批用命令行输入循环。</p>` },
-      { "t": "10、LSP 诊断注入和 IDE 的红色波浪线有什么区别", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“你说的 LSP 诊断注入，和 IDE 里的红色波浪线不是一回事吗？”</p>
+      { "t": "10、LSP 诊断注入和 IDE 的红色波浪线有什么区别", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“你说的 LSP 诊断注入，和 IDE 里的红色波浪线不是一回事吗？”</p>
 <p>本质是一样的，都是对代码做语法分析后输出诊断信息。但消费者不同。</p>
 <p>IDE 的红色波浪线，消费者是人。人看到波浪线，用眼睛定位出错位置，通过阅读悬浮提示理解错误原因，然后手动修改代码。</p>
 <p>Agent 的 LSP 诊断注入，消费者是 LLM。诊断结果被格式化成结构化文本，注入到下一轮请求的上下文中。LLM 收到后在推理过程中自动定位并修复错误。触发时机是 post-edit hook，只有文件被写入后才触发一次。展示方式是纯文本，带有行号、列号和错误等级。</p>
 <p><img src="assets/jimg/paicli-interview-productization-20260529090359.png" decoding="async" loading="lazy" fetchpriority="low" width="3712" height="2530"></p>
 <p>每条诊断的格式是 <code>[error] Foo.java:42:15 缺少分号 (javaparser)</code>，行号、列号、错误等级、来源一目了然。</p>
 <p>同时还有彩色版本用于终端显示，error 红色、warning 黄色、info 灰色，方便用户在终端里也能直观看到诊断结果。</p>` },
-      { "t": "11、Side-Git 快照的性能影响大吗？怎么优化", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“快照需要遍历所有文件、计算哈希，对大项目性能开销怎么样？”</p>
+      { "t": "11、Side-Git 快照的性能影响大吗？怎么优化", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“快照需要遍历所有文件、计算哈希，对大项目性能开销怎么样？”</p>
 <p>我们通过四个策略把影响控制在了可接受范围内。</p>
 <p>第一个是排除大文件目录。默认排除 <code>.git</code>、<code>node_modules</code>、<code>target</code>、<code>dist</code>、<code>.idea</code>、<code>*.class</code>、<code>*.jar</code>，以及 PaiCLI 自身的快照目录。用户可以通过配置项追加自定义排除规则。排除匹配支持精确匹配、目录前缀匹配和 glob 模式三种方式。</p>
 <p>第二个是区分同步和异步。推理前快照必须同步执行，因为 Agent 改文件之前的基线必须确保已经保存。推理后快照异步执行，不阻塞下一轮用户输入。</p>
 <p>第三个是快照数量上限。默认保留最近 50 轮的快照，超出的自动清理。也提供了手动清理命令。</p>
 <p>第四个是用 JGit 纯 Java 实现，不 fork git 子进程。避免了进程创建和销毁的开销，对象写入在 Java 堆内完成。</p>
 <p><img src="assets/jimg/paicli-interview-productization-20260529090339.png" decoding="async" loading="lazy" fetchpriority="low" width="3332" height="1934"></p>` },
-      { "t": "12、Runtime API 为什么选 SSE 而不是 WebSocket", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“你们的 API 用了 SSE，为什么不用 WebSocket？”</p>
+      { "t": "12、Runtime API 为什么选 SSE 而不是 WebSocket", "tag": "技术派·TUI/LSP/Git/Runtime", "p": "core", "html": `<p>“你们的 API 用了 SSE，为什么不用 WebSocket？”</p>
 <p>这是一个经典的技术选型题。</p>
 <p>先看场景需求：用户提交一轮输入后，等 Agent 流式返回结果。这是一个典型的单向流式场景，服务端持续推送，客户端只需要接收。</p>
 <p>SSE 在这个场景下有三个优势。</p>
@@ -1127,14 +1083,13 @@ curl http://127.0.0.1:8080/v1/threads/thread_0c25b7d80f8f/events \\
 
   mine.chapters.push({
     "no": "7",
-    "title": "技术派·多模型和提示词缓存（24 题）",
+    "title": "技术派·多模型和提示词缓存（13 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>老王这次没废话，直接开问：“PaiCLI 接了几家大模型？”</p>
 <p>“目前支持 GLM、DeepSeek、Kimi、StepFun。”</p>
 <p>“那你 API 调用的代码是不是写了四遍？”老王的语气里带着一点挑衅。</p>
 <p>我笑了：“那不至于，一个基类搞定，每个 Provider 实现就二三十行。”</p>` },
-      { "t": "01、怎么设计一个支持多模型的 LLM 客户端接口？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>策略模式。定义一个统一接口，每个模型的 Provider 自己实现差异化逻辑。</p>
+      { "t": "01、怎么设计一个支持多模型的 LLM 客户端接口？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>策略模式。定义一个统一接口，每个模型的 Provider 自己实现差异化逻辑。</p>
 <p>接口需要声明两组能力。</p>
 <p>第一组是行为能力，也就是对话方法。一般设计两个 chat 方法，一个带流式监听器参数，一个不带。不带监听器的方法内部调用带监听器的。</p>
 <p>第二组是声明式能力。包括模型名称、Provider 名称、最大上下文窗口、是否支持提示词缓存、缓存模式等等。</p>
@@ -1154,8 +1109,7 @@ curl http://127.0.0.1:8080/v1/threads/thread_0c25b7d80f8f/events \\
 <p>短期记忆预算、压缩触发阈值、MCP 资源索引，这些参数全部可以从上下文窗口大小推导出来。</p>
 <p>接口声明了这些能力后，上层不需要写 if-else 判断“当前是哪个模型”，直接读接口方法的返回值就行。</p>
 <p>四个 Provider 实现类共享一个基类，负责通用的 SSE 解析和 HTTP 请求逻辑，每个子类只覆盖 API 地址、默认模型名、API Key 来源这几个差异点。</p>` },
-      { "t": "02、模板方法模式在多模型适配里怎么用？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>都兼容 OpenAI 协议。</p>
+      { "t": "02、模板方法模式在多模型适配里怎么用？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>都兼容 OpenAI 协议。</p>
 <p>就是把相同的部分提到基类里，子类只覆盖差异点。</p>
 <p>基类的 chat 方法定义了完整的 SSE 请求-响应流程：构建请求体、发送 HTTP 请求、逐行解析 SSE 流、合并增量 tool_calls、提取 usage 统计、返回最终响应等。</p>
 <p><img src="assets/jimg/paicli-interview-multi-model-20260530110004.png" decoding="async" fetchpriority="high" width="3668" height="2514"></p>
@@ -1170,8 +1124,7 @@ public int maxContextWindow()   { return 1_000_000; }
 public boolean supportsPromptCaching() { return true; }
 public String promptCacheMode() { return "automatic-prefix-cache"; }
 </code></pre>` },
-      { "t": "03、OpenAI 兼容协议是什么？为什么大家都兼容它？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>OpenAI 兼容协议就是 OpenAI Chat Completions API 的请求和响应格式，分三层。</p>
+      { "t": "03、OpenAI 兼容协议是什么？为什么大家都兼容它？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>OpenAI 兼容协议就是 OpenAI Chat Completions API 的请求和响应格式，分三层。</p>
 <p><img src="assets/jimg/paicli-interview-multi-model-20260530113308.png" decoding="async" loading="lazy" fetchpriority="low" width="3692" height="2514"></p>
 <ul>
  <li>请求层：核心字段是 model、messages（每条包含 role 和 content）、tools（名称、描述、JSON Schema 参数定义）、stream 布尔值。</li>
@@ -1184,8 +1137,7 @@ public String promptCacheMode() { return "automatic-prefix-cache"; }
  <li><strong>标准化收益</strong>：Agent 框架只需要实现一套协议适配就能接入多家模型。</li>
  <li><strong>迁移成本低</strong>：GLM、DeepSeek、Kimi、StepFun 都兼容这套协议，差异主要在特有字段（比如 DeepSeek 的 reasoning_content、GLM 的 Coding 端点分离）、计费字段（缓存命中 token 的字段名不统一）和 Rate limit 响应头格式等。</li>
 </ul>` },
-      { "t": "04、运行时切换模型是怎么实现的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>靠工厂方法。</p>
+      { "t": "04、运行时切换模型是怎么实现的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>靠工厂方法。</p>
 <p>用户输入切换命令后，工厂方法接收 Provider 名称和配置，创建一个新的客户端实例。</p>
 <p><img src="assets/jimg/paicli-interview-multi-model-20260530110403.png" decoding="async" loading="lazy" fetchpriority="low" width="3812" height="984"></p>
 <p>切换流程分四步。</p>
@@ -1200,8 +1152,7 @@ public String promptCacheMode() { return "automatic-prefix-cache"; }
 <p>对话历史保持不变。但有几个变化。</p>
 <p>Token 预算会重新计算。比如从 200k 窗口的模型切到 1M 窗口的模型，可用预算自动提升。</p>
 <p>工具定义不变，所有模型共用同一套工具注册表。reasoning_content 的兼容也需要处理。历史中包含 DeepSeek 生成的 reasoning_content 字段，切到 GLM 后这些字段不会被发送给 GLM，除非目标模型声明了需要接收。</p>` },
-      { "t": "05、不同模型的 Token 计费差异有多大？怎么估算成本？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>以 2026 年 5 月 30 日核对到的官方公开定价为例（每百万 token）。美元报价保留官方币种，括号内人民币只做粗略折算：</p>
+      { "t": "05、不同模型的 Token 计费差异有多大？怎么估算成本？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>以 2026 年 5 月 30 日核对到的官方公开定价为例（每百万 token）。美元报价保留官方币种，括号内人民币只做粗略折算：</p>
 <table>
  <thead>
   <tr>
@@ -1274,8 +1225,7 @@ public String promptCacheMode() { return "automatic-prefix-cache"; }
 <p>可用预算等于总窗口大小减去系统提示预留（约 500 token）、工具定义预留（约 800 token）和回复预留（约 2000 token）。剩下的才是对话历史可以使用的空间。</p>
 <h4>为什么是 90% 而不是 100%？</h4>
 <p>因为需要留一段缓冲区。如果等到 100% 才压缩，最后一轮的输入可能已经超出窗口了，模型会直接报错。90% 这个阈值给压缩操作留出了大约 10% 窗口的安全余量。</p>` },
-      { "t": "06、Prompt Caching 在不同 Provider 之间有什么差异？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>各家的缓存机制差异不小，但有一个共同趋势：国产模型基本都走自动前缀缓存了。</p>
+      { "t": "06、Prompt Caching 在不同 Provider 之间有什么差异？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>各家的缓存机制差异不小，但有一个共同趋势：国产模型基本都走自动前缀缓存了。</p>
 <ul>
  <li>**DeepSeek：**服务端自动前缀缓存，客户端不需要做任何操作。服务端自动检测多次请求的公共前缀并持久化到硬盘，缓存命中后 usage 里返回 <code>prompt_cache_hit_tokens</code> 和 <code>prompt_cache_miss_tokens</code>。</li>
  <li>**GLM：**也是自动上下文缓存，客户端不需要手动配置。GLM-5.1 按输入长度分两档计费，<code>[0, 32k)</code> 档缓存命中 1.3 元/百万 token，<code>[32k, 200k]</code> 档缓存命中 2 元/百万 token。</li>
@@ -1292,8 +1242,7 @@ public String promptCacheMode() { return "automatic-prefix-cache"; }
 <p>所以 prompt 的组装顺序非常重要。</p>
 <p>系统提示词放最前面，几乎不变；个性化提示词紧随其后；然后是项目上下文；Skill 按需加载；最后是交接信息和对话历史，每轮都不同。</p>
 <p>这样稳定前缀越长，越容易持续命中缓存。如果把动态内容放到前面，每次都变化，前缀缓存收益就会明显下降。</p>` },
-      { "t": "07、上下文策略是怎么根据模型能力自动调整的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>全模型走同一套逻辑，只是窗口大小不同导致触发时机和容量不同。公式很简单：</p>
+      { "t": "07、上下文策略是怎么根据模型能力自动调整的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>全模型走同一套逻辑，只是窗口大小不同导致触发时机和容量不同。公式很简单：</p>
 <ul>
  <li>Agent 单次运行预算 = 窗口 × 0.8</li>
  <li>短期记忆预算 = 窗口 × 0.45</li>
@@ -1304,8 +1253,7 @@ public String promptCacheMode() { return "automatic-prefix-cache"; }
 <p>举个具体例子。</p>
 <p>从 GLM-5.1（200k 窗口）切到一个 32k 窗口的小模型，短期记忆预算从 90k 降到 14.4k，压缩触发阈值从 180k 降到 28.8k，MCP 资源索引刚好卡在开启的边界上。这些调整全部自动完成，不需要用户干预。</p>
 <p><img src="assets/jimg/paicli-interview-multi-model-20260530121603.png" decoding="async" loading="lazy" fetchpriority="low" width="3824" height="2630"></p>` },
-      { "t": "08、流式响应（SSE）的增量 tool_calls 合并是怎么做的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>LLM 的流式响应会把一个 tool_call 拆成多个 SSE chunk 返回。</p>
+      { "t": "08、流式响应（SSE）的增量 tool_calls 合并是怎么做的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>LLM 的流式响应会把一个 tool_call 拆成多个 SSE chunk 返回。</p>
 <p>比如调用 <code>read_file</code> 工具，第一个 chunk 可能只包含函数名的前半部分 <code>read_</code>，第二个 chunk 接上 <code>file</code>，第三个 chunk 返回参数 JSON 的前半段 <code>{"pa</code>，第四个 chunk 补上 <code>th":"pom.xml"}</code>。如果不做合并就直接解析参数 JSON，会解析失败。</p>
 <p>解决方案是用累加器模式。</p>
 <p>为每个 tool_call 维护一个累加器，里面有三个 StringBuilder，分别存 id、函数名和参数 JSON。每收到一个 SSE chunk，就根据 chunk 里的 index 字段找到对应的累加器，把增量内容 append 上去。多个并行的 tool_call 通过 index 区分，互不干扰。</p>
@@ -1322,8 +1270,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>偶尔会发生这种情况。</p>
 <p>LLM 的 max_tokens 限制或者网络中断都可能导致参数 JSON 不完整。</p>
 <p>处理策略是在流结束后、实际执行工具之前做 JSON 解析校验。如果参数 JSON 解析失败，Agent 不会执行工具，而是构造一条错误的 tool message 发回给 LLM，告诉它“你的参数 JSON 格式有误，请重新输出”。LLM 看到这条错误信息后，在下一轮对话中会自行修正参数格式重新调用工具。</p>` },
-      { "t": "09、API Key 的读取优先级是怎么设计的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>四级优先级，从高到低依次是：配置文件中对应 Provider 的 apiKey、环境变量（GLM_API_KEY / DEEPSEEK_API_KEY 等）、项目目录下的 .env 文件、用户主目录下的 .env 文件。</p>
+      { "t": "09、API Key 的读取优先级是怎么设计的？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>四级优先级，从高到低依次是：配置文件中对应 Provider 的 apiKey、环境变量（GLM_API_KEY / DEEPSEEK_API_KEY 等）、项目目录下的 .env 文件、用户主目录下的 .env 文件。</p>
 <h4>为什么这样排序？</h4>
 <ul>
  <li><strong>配置文件最高</strong>：通过命令设置的 Key 是用户最明确的意图表达，应该覆盖其他来源</li>
@@ -1338,15 +1285,13 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
  <li>配置文件存放在用户主目录的隐藏文件夹下（比如 <code>~/.paicli/</code>），不在项目目录内，不会被 Git 追踪</li>
  <li>Key 在日志输出时做脱敏处理，只显示前后各 4 位字符，中间用星号替代</li>
 </ul>` },
-      { "t": "10、如果模型不支持 Function Calling 怎么办？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>碰到不支持的模型，业界有两种常见的适配方式。</p>
+      { "t": "10、如果模型不支持 Function Calling 怎么办？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>碰到不支持的模型，业界有两种常见的适配方式。</p>
 <p>第一种是 Prompt 注入法。在 system prompt 里用自然语言描述工具的使用格式，约定一种标记语法（比如 XML 标签或 JSON 代码块），让 LLM 在回复文本里按这个格式输出工具调用。客户端用正则表达式匹配标记，解析出工具名和参数，执行后再把结果放回对话历史。</p>
 <p><img src="assets/jimg/paicli-interview-multi-model-20260530122656.png" decoding="async" loading="lazy" fetchpriority="low" width="3804" height="2634"></p>
 <p>比如在 system prompt 里告诉模型：“当你需要读文件时，请输出 <code>&lt;tool_call&gt;{"name": "read_file", "arguments": {"path": "xxx"}}&lt;/tool_call&gt;</code>”。客户端匹配 <code>&lt;tool_call&gt;...&lt;/tool_call&gt;</code> 标签提取 JSON，解析执行。</p>
 <p>第二种是中间层适配。在客户端和模型 API 之间加一个适配层，对上游完全透明，Agent 以为自己在和一个支持 Function Calling 的模型对话。适配层负责把 tools 定义转成 prompt 文本注入，再从模型的文本输出中解析出工具调用转成标准的 tool_calls 结构。</p>
 <p>PaiCLI 目前只接入支持 Function Calling 的模型，没做 Prompt 注入适配。但面试时了解这个思路很重要，如果面试官追问“怎么扩展到不支持 FC 的模型”，你可以说出 Prompt 注入法并分析其局限：解析成功率依赖 LLM 的格式遵循能力，比原生 Function Calling 低；多个工具并行调用时格式更容易出错；LLM 可能在工具调用标记外还输出一段解释文字，增加了解析复杂度。</p>` },
-      { "t": "11、Agent 的总成本怎么估算？有哪些优化手段？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>Agent 的成本等于所有 LLM 请求的 token 费用之和。一个复杂任务可能涉及 20 到 50 轮 LLM 调用，每轮都有输入和输出的费用。</p>
+      { "t": "11、Agent 的总成本怎么估算？有哪些优化手段？", "tag": "技术派·多模型和提示词缓存", "p": "core", "html": `<p>Agent 的成本等于所有 LLM 请求的 token 费用之和。一个复杂任务可能涉及 20 到 50 轮 LLM 调用，每轮都有输入和输出的费用。</p>
 <p>每次 session 结束后输出完整统计：调用次数、总输入 token、总输出 token、缓存命中 token、平均每轮输入 token、剩余预算。</p>
 <p><img src="assets/jimg/paicli-interview-multi-model-20260530122727.png" decoding="async" loading="lazy" fetchpriority="low" width="3980" height="2642"></p>
 <p>优化手段按效果排序：</p>
@@ -1502,7 +1447,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 
   mine.chapters.push({
     "no": "9",
-    "title": "技术派·腾讯一面 · Agent面经（24 题）",
+    "title": "技术派·腾讯一面 · Agent面经（13 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>不知道大家有没有发现，大模型公司都在卷终端 Agent，包括 Qoder CLI、Kimi Code、ZCode 等等。</p>
 <p>更别提Claude Code和Codex CLI了。</p>
@@ -1533,8 +1478,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
  <li>你平时用你的PaiCLI么？</li>
 </ol>
 <p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗发～）</p>` },
-      { "t": "01、介绍一下 PaiCLI 这个项目和流程", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王开门见山：“你简历上写了一个 PaiCLI 项目，对标 Claude Code？先介绍一下。”</p>
+      { "t": "01、介绍一下 PaiCLI 这个项目和流程", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王开门见山：“你简历上写了一个 PaiCLI 项目，对标 Claude Code？先介绍一下。”</p>
 <p>我说：“PaiCLI 是一个 Python 写的 Agent 命令行工具，核心架构是 ReAct 循环。”</p>
 <p>用户在终端输入一个任务，PaiCLI 把任务发给大模型，大模型决定要不要调用工具、调哪个、参数是什么。</p>
 <p>工具执行完后把结果返回给大模型，大模型再决定下一步动作。直到大模型认为任务完成，返回最终答案。</p>
@@ -1545,8 +1489,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717151243.png" decoding="async" loading="lazy" fetchpriority="low" width="2298" height="1124"></p>
 <p>/team 会进入 Multi-Agent 模式，多个 Agent 分工协作。</p>
 <p>“工具层面，内置了 9 个核心工具：文件读写、命令执行、代码搜索、目录浏览、web 搜索。通过 MCP 协议还可以接入外部工具，比如浏览器操作、数据库查询这些。”</p>` },
-      { "t": "02、有实现 Sub-agent 吗？怎么编排的？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王追问：“多 Agent 场景下你是怎么编排的？”</p>
+      { "t": "02、有实现 Sub-agent 吗？怎么编排的？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王追问：“多 Agent 场景下你是怎么编排的？”</p>
 <p>“规划者（Planner）接收用户任务，拆解成一组带依赖关系的执行步骤。”</p>
 <p>“比如用户说‘重构这个模块并写测试’，规划者会拆成：步骤 1 分析现有代码结构，步骤 2 执行重构（依赖步骤 1），步骤 3 写单元测试（依赖步骤 2），步骤 4 运行测试验证（依赖步骤 3）。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717141721-dc6bb70c.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
@@ -1558,15 +1501,13 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717142006-0ee7c154.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>老王点点头：“执行者之间的隔离怎么做的？”</p>
 <p>“每个执行者有独立的消息历史和 Skill 上下文缓冲区。并行执行时，输出各自写入独立的字节缓冲区，全部完成后再按原始顺序合并到终端，保证展示不会乱序。”</p>` },
-      { "t": "03、支持后台任务吗？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“前台跑 Agent 的时候能同时跑后台任务吗？”</p>
+      { "t": "03、支持后台任务吗？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“前台跑 Agent 的时候能同时跑后台任务吗？”</p>
 <p>“支持。后台任务用 SQLite 做持久化队列。”</p>
 <p>“状态机是 queued → running → completed 或 failed 或 canceled。”</p>
 <p>Worker 认领任务后，会通过心跳续期。如果 Worker 崩溃了，当前周期过期后其他 Worker 可以重新认领这个任务。</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717142136-4bbdf520.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
 <p>“启动时还有崩溃恢复：扫描所有 running 状态但租约已过期的任务，重置为 queued 重新排队。这样即使进程异常退出，未完成的任务也不会丢。”</p>` },
-      { "t": "04、Sub-agent 也支持 Plan 模式吗？Skill 怎么调用？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“Multi-Agent 里的执行者，能不能走 Plan 模式？”</p>
+      { "t": "04、Sub-agent 也支持 Plan 模式吗？Skill 怎么调用？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“Multi-Agent 里的执行者，能不能走 Plan 模式？”</p>
 <p>我说：“可以。每个执行步骤有一个 mode 字段，值可以是 react 或 plan。”</p>
 <p>规划者在拆解任务的时候可以判断某个步骤是否足够复杂，需要用 Plan 模式来执行。</p>
 <p>“Plan 模式的流程是：先调规划者生成一份 JSON 格式的执行计划，每个步骤有 id、描述、类型和依赖列表。”</p>
@@ -1582,8 +1523,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717142545-0948a183.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>“有个关键设计：每个 Sub-agent 有独立的 Skill 缓冲区，用 LRU 策略最多缓存 3 个 Skill。”</p>
 <p>因为 Skill 内容注入后会从缓冲区清空（drain 操作），如果多个 Sub-agent 共享同一个缓冲区，一个 Worker 的 drain 会把另一个 Worker 还没读到的内容清掉。</p>` },
-      { "t": "05、Skill 分层体系是怎么做的，为什么这么设计？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王说：“Skill 系统展开说说。”</p>
+      { "t": "05、Skill 分层体系是怎么做的，为什么这么设计？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王说：“Skill 系统展开说说。”</p>
 <p>我说：“三层加载，按优先级从低到高：内置 Skill 打包在程序里、用户级 Skill 放在 ~/.paicli/skills/ 目录、项目级 Skill 放在项目根目录的 .paicli/skills/ 目录。同名 Skill，优先级高的整体覆盖低的。”</p>
 <p>“每个 Skill 就是一个目录，核心是 SKILL.md 文件，用 frontmatter 声明名称、描述、版本、标签，正文就是给 LLM 看的决策手册。可选的 references/ 目录放参考资料，scripts/ 放可执行脚本。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717142707-ff6ac79f.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
@@ -1592,8 +1532,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>用户级满足个人工作流定制，比如我自己写了一个小红书热榜抓取的 Skill。</p>
 <p>项目级承载团队约定，比如代码审查规范，提交到仓库后团队所有人共享。</p>
 <p>这个思路和 Claude Code 的设计一脉相承，Claude Code 也是内置 Skill、用户 Skill、项目 Skill 三层。</p>` },
-      { "t": "06、用户输入怎么和 Skill 匹配？有积累机制吗？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王追问：“用户输入一段话，怎么知道该加载哪个 Skill？”</p>
+      { "t": "06、用户输入怎么和 Skill 匹配？有积累机制吗？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王追问：“用户输入一段话，怎么知道该加载哪个 Skill？”</p>
 <p>“打分制。每个 Skill 的得分由四个维度加权计算。精确名称匹配直接加 10000 分，确保用户点名要的 Skill 一定排第一。名称中的词项命中权重 ×12，标签词项 ×6，描述词项 ×2。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717143013-6dc20751.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
 <p>“分词策略分中英文两套。”</p>
@@ -1619,16 +1558,14 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
  <li>实现了基于滚动摘要的上下文压缩机制，在 80% 窗口阈值自动触发压缩，保留近 6 轮对话完整性，支持百万 token 级长对话</li>
 </ul>
 <hr>` },
-      { "t": "07、长短期记忆怎么设计的？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王换了个方向：“Agent 的记忆系统怎么做的？”</p>
+      { "t": "07、长短期记忆怎么设计的？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王换了个方向：“Agent 的记忆系统怎么做的？”</p>
 <p>我说：“三层。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717143321-74f77e12.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
 <p>“短期记忆就是当前对话的消息历史。用户说了什么、LLM 回了什么、工具返回了什么，每轮 LLM 调用都带上。本质是一个不断增长的消息列表。”</p>
 <p>“长期记忆用 SQLite 存储。”</p>
 <p>每条记忆绑定了 scope（项目路径，实现项目隔离）、content（记忆内容）、importance（重要性，0 到 1）、confidence（置信度，0 到 1）、access_count（被召回的次数）、content_hash（SHA256 哈希，用于去重）。</p>
 <p>“长期静态记忆就是 PAI.md 文件。项目根目录或 .paicli 目录下放一个 PAI.md，启动时自动加载到系统提示词里。功能类似 Claude Code 的 CLAUDE.md。”</p>` },
-      { "t": "08、为什么要分静态长期记忆和动态长期记忆？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王追问：“为什么不统一成一种？”</p>
+      { "t": "08、为什么要分静态长期记忆和动态长期记忆？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王追问：“为什么不统一成一种？”</p>
 <p>“用途不同。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717143606-bd620fbe.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>“静态记忆存的是团队规范和项目约定，比如代码风格、分支策略、部署流程。”</p>
@@ -1636,8 +1573,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“动态记忆存的是用户特定的事实和偏好，比如‘这个项目用的是 PostgreSQL 而不是 MySQL’。这些信息在交互过程中学习积累，按项目隔离存储在 SQLite 里。”</p>
 <p>“分开存的好处是职责清晰：静态记忆由开发者维护，走版本控制；动态记忆由 Agent 自动管理，不会污染代码仓库。”</p>
 <p>两者在 Prompt 组装时合并注入系统提示词，静态的先加载、动态的后加载。</p>` },
-      { "t": "09、什么时候触发记忆存储？会不会越存越多？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“长期记忆是怎么触发存储的？膨胀怎么控制？”</p>
+      { "t": "09、什么时候触发记忆存储？会不会越存越多？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“长期记忆是怎么触发存储的？膨胀怎么控制？”</p>
 <p>“触发有两种方式。用户执行 /save 命令主动存储，或者对话中说‘记住这个’‘帮我记一下’，LLM 会调用 save_memory 这个内置工具自动存。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717143747-df4313be.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>“去重用 content_hash。把记忆内容做 Unicode 归一化后算 SHA256，如果哈希已存在，不创建新记录，只把 importance 和 confidence 取两者中的较大值更新上去。”</p>
@@ -1650,8 +1586,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>词汇覆盖率占 72%，把查询和记忆内容各自提取词项特征，算交集占比，加上子串完全匹配的额外加成。</p>
 <p>重要性占 12%，置信度占 8%，时间衰减占 6%（半衰期 30 天，一条记忆 30 天没更新过，时间分就衰减到一半），访问频率占 2%（用对数函数平滑，避免高频访问的记忆垄断排名）。</p>
 <p>“召回阈值设定为 0.05。这个值很低，因为宁可多召回几条不太相关的，也不要漏掉真正有用的。LLM 自己能判断哪些记忆和当前任务有关，不需要评分系统做太严格的过滤。”</p>` },
-      { "t": "10、上下文压缩机制是怎么做的？", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“对话太长，上下文窗口装不下怎么办？”</p>
+      { "t": "10、上下文压缩机制是怎么做的？", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王问：“对话太长，上下文窗口装不下怎么办？”</p>
 <p>我说：“自动压缩。触发条件满足任一个就启动：估算的 token 数超过可用输入 token 的 80%，或者消息数超过 100 条。”</p>
 <p>“可用输入 token 的计算方式：上下文窗口总大小减去最大输出 token 数，再减去 1024 的预留空间。比如模型窗口 128K，最大输出 8K，可用输入约 119K，80% 触发阈值约 95K。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717144235-c01c5a39.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
@@ -1664,8 +1599,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“压缩目标是可用 token 的 55%。为什么 80% 触发、55% 压缩？留出来的空间给当前轮的输入、系统提示词里动态注入的部分（比如刚召回的记忆），以及 LLM 可能返回的多个工具调用。压缩得太晚太少，当前轮的请求可能直接超窗口。”</p>
 <p><img src="assets/jimg/paicli-agent-mianshi-20260717144431-482b48f8.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
 <p>“token 估算用经验公式：中文字符按 1 token/字，英文按 3 个字符 1 个 token。偏保守，代码多的场景会高估。但高估比低估安全，低估可能导致请求超出模型窗口被截断。”</p>` },
-      { "t": "11、讲一下动态 Prompt 和静态 Prompt", "tag": "技术派·腾讯一面", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王说：“你的系统提示词是怎么组装的？”</p>
+      { "t": "11、讲一下动态 Prompt 和静态 Prompt", "tag": "技术派·腾讯一面", "p": "core", "html": `<p>老王说：“你的系统提示词是怎么组装的？”</p>
 <p>“分成静态部分和动态部分。”</p>
 <p>“静态部分在一个会话里不会变，构建一次就缓存。包括人格设定（语气风格）、核心行为准则（工具使用规范、安全策略）、项目指令（PAI.md 的内容）。”</p>
 <p>“动态部分每次 LLM 请求都重新构建。包括当前时间和时区、工作目录路径、当前使用的模型名称和 provider、已启用的 Skill 索引、刚召回的相关长期记忆。”</p>
@@ -1693,7 +1627,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 
   mine.chapters.push({
     "no": "10",
-    "title": "技术派·拼多多 · Agent面经（32 题）",
+    "title": "技术派·拼多多 · Agent面经（17 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>大家好，我是二哥呀。</p>
 <p>有小伙伴在群里扔了一段聊天记录，大意是：当你看到这个图之后再打开拼多多，你的推荐列表里一定会出现遐蝶手办。</p>
@@ -1705,8 +1639,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>相信很多小伙伴都好奇，正好我也收集了一份拼多多 Agent 岗的面经，附带我自己的答案一并分享给大家。</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720113925.png" decoding="async" loading="lazy" fetchpriority="low" width="934" height="1676" class="article-content-img--text-shot" style="--article-img-max-width: 467px;"></p>
 <p>（全文比较肝，保证大家能学到很多，系好安全带，我们粗粗粗发了～）</p>` },
-      { "t": "01、拼多多推荐系统背后用到了哪些 AI 技术？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王的第一个问题：“用户看了一张图片，打开拼多多就能看到相关商品推荐。背后是什么原理？”</p>
+      { "t": "01、拼多多推荐系统背后用到了哪些 AI 技术？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王的第一个问题：“用户看了一张图片，打开拼多多就能看到相关商品推荐。背后是什么原理？”</p>
 <p>如果真能做到跨 App 的图像识别到推荐，大概是这样这样：</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720114747.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <ul>
@@ -1724,8 +1657,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <blockquote>
  <p>GitHub 地址：<a href="https://github.com/itwanger/PaiCLI-Python">https://github.com/itwanger/PaiCLI-Python</a></p>
 </blockquote>` },
-      { "t": "02、三层记忆架构为什么这么设计？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“Agent 的记忆架构是怎么分层的？为什么要这么分？”</p>
+      { "t": "02、三层记忆架构为什么这么设计？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“Agent 的记忆架构是怎么分层的？为什么要这么分？”</p>
 <p>我说：“三层。第一层是短期记忆，存当前对话的上下文，包括用户说了什么、助手回了什么、工具调用了什么结果。”</p>
 <p>它的底层是一个 LinkedHashMap，按插入顺序维护，有一个 token 预算上限。</p>
 <p>当 token 超出预算，自动淘汰最早的条目，淘汰的条目会被暂存到一个压缩摘要队列里，等待后续被 LLM 摘要。</p>
@@ -1735,15 +1667,13 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“第三层是记忆检索层，它不存数据，而是负责从前两层中检索与当前查询最相关的记忆。”</p>
 <h4>为什么要这么分？</h4>
 <p>“因为 LLM 的上下文窗口是有限资源。短期记忆解决‘当前对话不丢’的问题，长期记忆解决‘跨会话能想起来’的问题，检索层解决‘该想起哪些’的问题。三层各管各的，互不干扰。”</p>` },
-      { "t": "03、文件作为事实源，为什么不直接用 RAG / 向量数据库存？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王追问：“长期记忆用 JSON 文件存？为什么不上向量数据库？”</p>
+      { "t": "03、文件作为事实源，为什么不直接用 RAG / 向量数据库存？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王追问：“长期记忆用 JSON 文件存？为什么不上向量数据库？”</p>
 <p>我说：“因为长期记忆存的是精炼的事实，不是大段文本。一条典型的长期记忆就是‘用户偏好用 zsh 而不是 bash’这种。”</p>
 <p>数据量小，几十条到几百条，用关键词匹配就够了。</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720120624-ace930d2.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“更关键的是，长期记忆需要高频读写和即时一致性。用户说‘记一下，以后访问语雀优先复用 Chrome 登录态’，我必须立刻存进去，下一轮对话就能用上。”</p>
 <p>JSON 文件的写入是同步的，每次 store 操作完成后数据就在磁盘上了。如果用向量数据库，还得等 embedding 计算、索引更新，延迟和复杂度都上来了。</p>` },
-      { "t": "04、文件作为事实源，怎么保证时效性和一致性？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“那文件存储怎么保证数据不过期、不冲突？”</p>
+      { "t": "04、文件作为事实源，怎么保证时效性和一致性？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“那文件存储怎么保证数据不过期、不冲突？”</p>
 <p>我说：“时效性靠两个机制。”</p>
 <p>第一，写入时即持久化。ConcurrentHashMap 保证并发安全，每次 store 之后立刻把整个条目列表序列化写入磁盘。</p>
 <p>第二，检索时有时间衰减。记忆的 timestamp 会参与相关度计算，越旧的记忆在检索排序中越靠后。一条 24 小时前存入的事实，它的分数会自动降到新事实的一半。</p>
@@ -1751,15 +1681,13 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“一致性靠去重。长期记忆在 store 时会遍历已有条目，如果新条目的 content 和已有条目完全一致，直接跳过不存。防止 LLM 反复提取同一个事实导致记忆膨胀。”</p>
 <p>“另外，长期记忆要区分作用域。”</p>
 <p>每条记忆有一个 scope 字段，分 project 和 global 两种。项目级别的事实只在对应项目路径下可见，全局偏好才跨项目共享。检索时会按项目路径做可见性过滤，避免 A 项目的事实污染 B 项目的上下文。</p>` },
-      { "t": "05、文件太大时，索引不能每次读全文，怎么办？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王点点头，接着问：“记忆文件越来越大，全量加载不现实，怎么办？”</p>
+      { "t": "05、文件太大时，索引不能每次读全文，怎么办？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王点点头，接着问：“记忆文件越来越大，全量加载不现实，怎么办？”</p>
 <p>两个层面。</p>
 <p>第一，长期记忆本身的体量控制。长期记忆只存精炼事实，不存对话原文和工具输出。工具结果在短期记忆中就被截断到 500 字符以内，不会流入长期记忆。加上内容去重机制，长期记忆条目数通常在几十到几百这个量级，JSON 文件撑死也就几百 KB，全量加载毫无压力。</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720121205-e0da4032.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>第二，注入到 LLM 上下文时的预算控制。每次调用 LLM 前，记忆检索层从长期记忆中捞最相关的几条注入到 system prompt 里，注入量有硬上限，context window 的千分之五，最多不超过 5000 token。</p>
 <p>这意味着即使长期记忆有 500 条，注入到 LLM 上下文的也就十来条。</p>` },
-      { "t": "06、Agent 是怎么调用工具的？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王说：“记忆聊清楚了，说说工具调用。Agent 是怎么调工具的？”</p>
+      { "t": "06、Agent 是怎么调用工具的？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王说：“记忆聊清楚了，说说工具调用。Agent 是怎么调工具的？”</p>
 <p>我说：“标准的 Function Calling 机制。”</p>
 <p>核心循环是一个 while(true) 的 ReAct 循环。</p>
 <p>每一轮迭代，Agent 把当前的对话历史连同工具定义列表一起发给 LLM。</p>
@@ -1778,15 +1706,13 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“但从 LLM 的视角看，MCP 工具和内置工具没有区别。”</p>
 <p>这个管理模块在启动时会把每个 MCP Server 暴露的工具注册到同一个工具注册表里，工具名格式是 mcp__serverName__toolName。</p>
 <p>LLM 不关心工具是内置的还是 MCP 的，它只看工具定义列表里的名称和参数描述。</p>` },
-      { "t": "07、Agent 怎么去判断是否需要调用工具？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“那判断调不调工具，是 Agent 的逻辑还是 LLM 的逻辑？”</p>
+      { "t": "07、Agent 怎么去判断是否需要调用工具？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“那判断调不调工具，是 Agent 的逻辑还是 LLM 的逻辑？”</p>
 <p>我说：“是 LLM 自己判断的。Agent 不做任何‘要不要调工具’的硬编码判断。”</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720121921-1d4d0751.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>每一轮 ReAct 循环，Agent 把所有可用的工具定义传给 LLM，LLM 在深度推理之后自己决定：这一轮需要调什么工具、传什么参数，还是直接回复用户。</p>
 <p>“Agent 只做两件事：一是把工具的名称、描述和参数 schema 组装成标准的 JSON 格式传给 LLM，让它理解每个工具能做什么；二是忠实执行 LLM 返回的 toolCalls，不加干涉。”</p>
 <p>“这就是 Function Calling 的核心理念——工具选择权交给模型。Agent 是执行者，不是决策者。”</p>` },
-      { "t": "08、工具调用失败时，怎么保证 Agent 不死循环或乱回答？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王紧跟着追问：“万一工具调用失败了呢？Agent 会不会反复重试、陷入死循环？”</p>
+      { "t": "08、工具调用失败时，怎么保证 Agent 不死循环或乱回答？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王紧跟着追问：“万一工具调用失败了呢？Agent 会不会反复重试、陷入死循环？”</p>
 <p>我说：“不会，有三道防线。”</p>
 <p>第一道是循环预算机制，它在每轮循环开始前做预算检查。</p>
 <p>预算机制追踪三个维度：累计 token 消耗、已执行的迭代次数、以及死循环检测。</p>
@@ -1796,16 +1722,14 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“工具注册表在执行工具时把所有异常分成三类：策略拒绝（路径越权、命令被禁）返回’策略拒绝’前缀的消息；普通异常返回’工具执行失败’前缀的消息；工具超时返回’工具执行超时，已取消’。”</p>
 <p>无论哪种情况，异常都被捕获并转成自然语言字符串，作为 tool 角色的消息返回给 LLM。LLM 看到失败消息后会自行决定：换一种方式再试，还是直接告诉用户操作失败。</p>
 <p>“第三道是多 Agent 模式下的 Reviewer 审查。如果用的是多 Agent 协作模式，每个步骤执行完后会经过 Reviewer 审查。Reviewer 判定不合格的步骤最多重试 2 次，超过次数保留当前结果并标记步骤状态，不会无限重试。”</p>` },
-      { "t": "09、有没有做防止反复存储无意义记忆的预防机制？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“前面提到长期记忆会自动提取事实。那 LLM 提取出一堆垃圾怎么办？”</p>
+      { "t": "09、有没有做防止反复存储无意义记忆的预防机制？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“前面提到长期记忆会自动提取事实。那 LLM 提取出一堆垃圾怎么办？”</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720122538-dc969991.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>我说：“做了三层过滤。”</p>
 <p>“第一层是意图检测。长期记忆的存储只有两个入口：一是用户通过对话明确说‘记一下’‘记住’‘以后记得’，触发 save_memory 工具；二是上下文压缩时自动提取事实。自动提取的 prompt 里明确告诉 LLM ‘绝对不要提取当前这一轮执行的临时任务、一次性的文件名、模型自己的猜测’。”</p>
 <p>“第二层是硬编码过滤。即使 LLM 还是返回了不该存的内容，代码里有两组关键词列表做二次拦截。”</p>
 <p>“一组是临时事实前缀——以‘用户想’‘帮我’‘新建’‘删除’‘当前这一轮’等开头的句子直接过滤掉。另一组是推测线索——包含‘可能’‘应该’‘猜测’‘推测’等词的句子也过滤掉。只有通过这两关的、且包含持久事实特征（如‘用户偏好’‘项目’‘技术栈’‘配置’等关键词）的句子才会真正存入长期记忆。”</p>
 <p>“第三层是存储时的内容去重。长期记忆在写入前会遍历已有条目，content 完全相同的直接跳过。”</p>` },
-      { "t": "10、MCP 协议解决了什么问题？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王说：“聊聊 MCP。它解决的核心问题是什么？”</p>
+      { "t": "10、MCP 协议解决了什么问题？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王说：“聊聊 MCP。它解决的核心问题是什么？”</p>
 <p>我说：“一句话概括：MCP 解决的是 Agent 工具接入的标准化问题。”</p>
 <p>在没有 MCP 之前，每接一个外部工具，就得在 Agent 代码里硬编码一套调用逻辑，HTTP 调一套、CLI 调一套、SDK 调又一套，参数格式、错误处理全不统一。MCP 把工具接入抽象成了一个统一的协议层。</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720122728-28141a58.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
@@ -1815,8 +1739,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“第三步是工具发现。MCP Server 启动后，Agent 调 tools/list 就能拿到这个 Server 暴露的所有工具的名称、描述和参数 JSON Schema。”</p>
 <p>Agent 把这些工具自动注册到自己的工具注册表里，LLM 就能像调内置工具一样调 MCP 工具。</p>
 <p>整个过程是动态的，MCP Server 还能发 notifications/tools/list_changed 通知，Agent 会自动重新拉取工具列表并更新注册。</p>` },
-      { "t": "11、Agent 的上下文窗口满了怎么办？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“上下文窗口快满了，怎么处理？”</p>
+      { "t": "11、Agent 的上下文窗口满了怎么办？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“上下文窗口快满了，怎么处理？”</p>
 <p>我说：”自动压缩。Agent 里有一个对话历史压缩模块，在每轮 ReAct 循环调 LLM 之前做一次检查。它先估算当前对话历史的总 token 数，如果超过压缩阈值就触发压缩。”</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720122945-f2778a13.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>“压缩阈值是根据模型的 context window 动态计算的：context window 减去摘要输出预留（最多 20000 token）再减去自动压缩缓冲（最多 13000 token），就是触发阈值。比如 128K 的模型，阈值大概在 95K 左右。”</p>
@@ -1831,15 +1754,13 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“第二套压缩的是短期记忆。”</p>
 <p>它用的是 Map-Reduce 模式：先把旧的记忆条目按 5 条一组分片，每片单独让 LLM 摘要，然后再把所有分片摘要合并成一个总摘要。</p>
 <p>总摘要以 SUMMARY 类型回注到短期记忆中。同时，压缩过程中还会从旧对话里自动提取持久事实存入长期记忆。</p>` },
-      { "t": "12、RAG 的具体流程", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王若有所思：“行，那说说 RAG。整个 RAG 流程是怎样的？”</p>
+      { "t": "12、RAG 的具体流程", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王若有所思：“行，那说说 RAG。整个 RAG 流程是怎样的？”</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720123356-dda39038.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>我说：“四步。第一步分块。代码分块器对 Java 文件做 AST 解析，用 JavaParser 解析出所有的类声明和方法声明，类级别生成一个 chunk，每个方法单独生成一个 chunk。非 Java 文件按字符数分段，每段不超过 2000 字符。”</p>
 <p>“第二步 Embedding。每个 chunk 的文本送给 Embedding 模型生成向量。支持 Ollama 本地模型和 OpenAI 兼容的远程 API。向量和 chunk 元信息一起存入 SQLite 数据库。”</p>
 <p>“第三步建索引。SQLite 里有两张核心表：code_chunks 存代码块和向量，code_relations 存代码间的依赖关系（谁调用了谁、谁继承了谁）。索引按项目路径隔离。”</p>
 <p>“第四步检索。用户输入一个自然语言查询，检索器同时走两条路：语义检索和关键词检索，结果合并去重后返回 TopK。”</p>` },
-      { "t": "13、Embedding，RAG 如何检索向量？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王追问：“具体是怎么做混合检索的？”</p>
+      { "t": "13、Embedding，RAG 如何检索向量？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王追问：“具体是怎么做混合检索的？”</p>
 <p>我说：“语义检索就是标准的向量相似度搜索。”</p>
 <p>把用户查询文本送给 Embedding 模型得到查询向量，然后和数据库里所有 chunk 的向量逐一计算余弦相似度，按相似度降序排列取 TopK。</p>
 <p>余弦相似度的计算是在内存里做的，因为代码库的 chunk 量级通常是几百到几千，暴力遍历完全撑得住。</p>
@@ -1848,8 +1769,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720123608-09d0a9e7.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>“合并的逻辑是：以 filePath#name 为唯一键去重，如果同一个 chunk 在两路检索中都出现了（双重命中），额外加 0.1 的奖励分。”</p>
 <p>“然后还有一个代码类型加分：method 类型加 0.15，class 类型加 0.10，因为方法和类比整个文件更直接回答‘怎么实现’的问题。最终按总分降序排列，同一个文件最多保留 2 个结果，防止某个大文件霸占所有位置。”</p>` },
-      { "t": "14、Agent 的 Memory 是如何进行管理的？都存在哪些地方？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“总结一下，Agent 的记忆都存在哪些地方？”</p>
+      { "t": "14、Agent 的 Memory 是如何进行管理的？都存在哪些地方？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王问：“总结一下，Agent 的记忆都存在哪些地方？”</p>
 <p>我说：“四个地方。”</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720124046-eb6c551e.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <ul>
@@ -1859,8 +1779,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
  <li><strong>向量索引（RAG）</strong>：代码向量索引，存在 <code>~/.paicli/rag/codebase.db</code> 的 SQLite 数据库里。这个不属于对话记忆，是代码库的离线索引</li>
 </ul>
 <p>“记忆管理模块是这套系统的门面，统一管理短期记忆、长期记忆、上下文压缩器和记忆检索器。Agent 只和它交互，不直接操作底层的存储。”</p>` },
-      { "t": "15、多 Agent 系统，Agent 之间如何协作？", "tag": "技术派·拼多多", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王说：“说说多 Agent。系统里 Agent 之间怎么协作？”</p>
+      { "t": "15、多 Agent 系统，Agent 之间如何协作？", "tag": "技术派·拼多多", "p": "core", "html": `<p>老王说：“说说多 Agent。系统里 Agent 之间怎么协作？”</p>
 <p>我说：“主从架构，一个编排器（Orchestrator）加三种角色的 Sub-agent：规划者（Planner）、执行者（Worker）、审查者（Reviewer）。”</p>
 <p><img src="assets/jimg/agent-mianshi-paicli-20260720124304-29ac6360.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>“协作流程分四个阶段。第一阶段，用户提交任务后，编排器把任务交给规划者。规划者的职责是把任务拆解成一组带依赖关系的子步骤，输出一个 JSON 格式的执行计划，每个步骤有 id、描述和依赖列表。”</p>
@@ -1901,14 +1820,13 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 
   mine.chapters.push({
     "no": "11",
-    "title": "技术派·腾讯面试官 · Agent面经（16 题）",
+    "title": "技术派·腾讯面试官 · Agent面经（9 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>大家好，我是二哥呀。</p>
 <p>如果你是一位愿意相信努力、相信过程、相信一步一个脚印、相信自己能在 AI 时代分一杯羹的人，那接下来这份硬核的面经，希望你能认真读一读。</p>
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721163620.png" decoding="async" fetchpriority="high" width="912" height="1336" class="article-content-img--text-shot" style="--article-img-max-width: 456px;"></p>
 <p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗发～）</p>` },
-      { "t": "01、LLM 和 Agent 之间的联系和区别", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王第一问是概念题。“讲一下 LLM 和 Agent 之间的联系和区别。”</p>
+      { "t": "01、LLM 和 Agent 之间的联系和区别", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王第一问是概念题。“讲一下 LLM 和 Agent 之间的联系和区别。”</p>
 <p>“先说联系。Agent 的每一次决策都由 LLM 做出。”</p>
 <p>“要不要调工具、调哪个、参数怎么填、任务算不算完成，全是模型在拿主意，Agent 框架本身不做判断。”</p>
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721120447-584de154.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
@@ -1923,8 +1841,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>老王追问。“那网页版的对话助手算 Agent 吗？”</p>
 <p>“看有没有 ReAct 循环。纯问答是单次调用，进去一段话出来一段话，不算；一旦它开始自己联网检索、自己跑代码、拿着中间结果继续往下推进，就已经是轻量级的 Agent 了。”</p>
 <p>“判断标准不是产品形态，是有没有『决策、行动、观察结果、再决策』的闭合回路。至于 ReAct 具体怎么转，下一题正好展开。”</p>` },
-      { "t": "02、ReAct Agent 由哪几部分组成", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王点点头。“了解 ReAct Agent 吧？它由哪几部分组成？”</p>
+      { "t": "02、ReAct Agent 由哪几部分组成", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王点点头。“了解 ReAct Agent 吧？它由哪几部分组成？”</p>
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721120811-af1d4a02.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“ReAct 就是推理加行动（Reasoning + Acting）的循环。拿我自己写的 PaiCLI-Python 来说，拆开是五个部分，每个都能落到具体模块：”</p>
 <ul>
@@ -1942,8 +1859,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“是后者的话，执行器把工具跑完，结果以 tool 消息追加回历史，再次调模型。模型看到工具结果继续决策，要么接着调，要么给出最终回答。”</p>
 <p>“退出条件有两个。模型不再请求工具，正常结束；或者到达 20 轮上限，强制收尾。”</p>
 <p>“执行上还有两个细节。一个是只读工具最多 4 个并发跑，写操作严格串行，防止互相覆盖；另一个是流式场景下工具调用的参数是分片到达的，要按序号把参数片段拼接完整，再解析成 JSON 交给执行器，拼早了就是半截 JSON，直接解析失败。”</p>` },
-      { "t": "03、设计一个 Agent 框架，会分哪些模块", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王往椅背上一靠。“如果从零设计一个 Agent 框架，会分哪些模块？”</p>
+      { "t": "03、设计一个 Agent 框架，会分哪些模块", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王往椅背上一靠。“如果从零设计一个 Agent 框架，会分哪些模块？”</p>
 <p>“核心六层：”</p>
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721121343-a5479a61.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <ul>
@@ -1962,8 +1878,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721121630-23bcf0eb.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“关键的设计决定是，所有模块对外只输出一种东西，统一格式的流式事件。文本增量、思考增量、工具调用、用量统计，都是事件，入口层只管渲染，不掺和逻辑。”</p>
 <p>“好处是每层都能单独替换。换模型只动模型层，加工具只动注册表，改界面只动入口层。”</p>` },
-      { "t": "04、MCP 和 tool 之间有什么联系和区别", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王在本子上记了一笔。“MCP 和 tool 之间的联系和区别，说说看。”</p>
+      { "t": "04、MCP 和 tool 之间有什么联系和区别", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王在本子上记了一笔。“MCP 和 tool 之间的联系和区别，说说看。”</p>
 <p>“区别看归属。tool 是应用内的函数，我自己写、自己注册、跟着代码走，别的应用用不了。”</p>
 <p>“MCP 把工具从应用里拆出来，变成独立的服务进程，任何支持 MCP 的客户端都能连上来用。解决的是 M 个应用对接 N 个工具的组合爆炸问题。”</p>
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721121916-1ec2f461.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
@@ -1978,8 +1893,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“配置也是分层合并的。用户目录一份全局配置，项目目录一份局部配置，同名服务后者覆盖前者，路径里支持环境变量展开。”</p>
 <p>“某个 server 连不上时单独隔离并记下错误，不影响其他工具正常注册。”</p>
 <p>“还有个容易被忽略的点。MCP 除了工具还有资源和提示词模板，我把它们也映射成了虚拟工具，列资源、读资源和调用普通工具走的是同一条路径，模型侧不用学新动作。”</p>` },
-      { "t": "05、短期记忆和长期记忆是怎么做的", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王翻了页简历。“项目里的智能问答，短期记忆和长期记忆是怎么做的？”</p>
+      { "t": "05、短期记忆和长期记忆是怎么做的", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王翻了页简历。“项目里的智能问答，短期记忆和长期记忆是怎么做的？”</p>
 <p>“短期记忆就是会话内的消息历史，一个列表，上限 100 条，配合上下文压缩工作。”</p>
 <p>“压缩的触发线是可用输入预算的 80%，一旦超过就压到 55%，最近 6 条消息原样保留，更早的轮次做提取式摘要。分割边界落在用户消息上，保证工具调用和结果成对出现。”</p>
 <p>“长期记忆用 SQLite 存在用户目录下，跨会话生效，按项目路径隔离作用域。有几个设计细节可以展开：”</p>
@@ -2024,8 +1938,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 </table>
 <p>“文件记忆还有一个本地覆盖层 PAI.local.md，存只属于本机的配置，不进版本库。加载也有预算，单文件截断 6000 字符，合并总量 16000 字符，防止记忆把窗口吃穷。”</p>
 <p>这张表建议存下来，答记忆类的题基本都能套。</p>` },
-      { "t": "06、Skill 的渐进式加载机制了解吗", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王抛出下一问。“了解 Skill 的渐进式披露（progressive disclosure）机制吗？”</p>
+      { "t": "06、Skill 的渐进式加载机制了解吗", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王抛出下一问。“了解 Skill 的渐进式披露（progressive disclosure）机制吗？”</p>
 <p>“了解，核心就八个字，索引常驻，正文按需。具体分两段。”</p>
 <p><img src="assets/jimg/agent-mianshi-tengxun-20260721122347-639d6bee.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第一段，每次用户输入时，只把匹配度最高的 5 个 Skill 的名字和描述注入上下文，单条描述截断到 300 字符，整个索引不超过 4000 字符。这时模型知道有哪些技能可用，但一个字的正文都没进来。”</p>
@@ -2035,8 +1948,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>老王追问。“候选是怎么匹配出来的？”</p>
 <p>“加权打分。用户显式点名某个 Skill 直接给最高分；否则按命中位置算，名字命中的权重最高，标签次之，描述最低，中文还做了二元、三元分词来提升召回。”</p>
 <p>“说白了就是一个微型搜索引擎，检索对象从网页换成了技能。”</p>` },
-      { "t": "07、使用 AI 时，如何保证输出内容的质量", "tag": "技术派·腾讯面试官", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王问出最后一道正题。“在使用 AI 时，应该怎么保证输出内容的质量？”</p>
+      { "t": "07、使用 AI 时，如何保证输出内容的质量", "tag": "技术派·腾讯面试官", "p": "core", "html": `<p>老王问出最后一道正题。“在使用 AI 时，应该怎么保证输出内容的质量？”</p>
 <p>“分三层答，先说我实现了的。”</p>
 <ul>
  <li>写后自检：写入或修改 Python 文件后立即做语法编译检查，报错附在工具结果里回给模型，让它当轮就改</li>
@@ -2085,7 +1997,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 
   mine.chapters.push({
     "no": "12",
-    "title": "技术派·携程 · Agent面经（22 题）",
+    "title": "技术派·携程 · Agent面经（12 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>看到这样一则爆料。</p>
 <blockquote>
@@ -2115,16 +2027,14 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <blockquote>
  <p>GitHub: <a href="https://github.com/itwanger/PaiCLI-Python">https://github.com/itwanger/PaiCLI-Python</a></p>
 </blockquote>` },
-      { "t": "01、Claude Code 与 Codex 各自有什么特别？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>老王翻开面试题，直接问：“Claude Code 和 Codex 你都用过吗？各自有什么特别的地方？”</p>
+      { "t": "01、Claude Code 与 Codex 各自有什么特别？", "tag": "技术派·携程", "p": "core", "html": `<p>老王翻开面试题，直接问：“Claude Code 和 Codex 你都用过吗？各自有什么特别的地方？”</p>
 <p>“都用过。这两个产品方向完全不一样。”</p>
 <p>“Claude Code 是 Anthropic 做的终端 Agent，最大的特点是实时交互，和 AI 时代完美契合，不需要 IDE 就可以完成 Coding 工作。在终端里给它任务，然后读代码、改文件、跑命令，整个过程全程可见，并且随时可以打断、纠正。就目前来说，Claude Code 就是最强的终端 Agent，没有之一。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727110628-0058d2f0.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
 <p>“Codex 是 OpenAI 做的桌面端 Agent，走的是异步多线程，可视化比 Claude Code 更强。”</p>
 <p>“我个人是两者的重度用户，Claude Code 配合 Opus 模型在文本领域更强，整体架构能力上更强。Codex 我更喜欢配合 GPT-5.6 Sol 做代码开发和生图，特别消耗 Token的任务也会交给它。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727130738.png" decoding="async" loading="lazy" fetchpriority="low" width="2578" height="1748"></p>` },
-      { "t": "02、输入到模型的 prompt 由哪些部分组成？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>“你做的 Agent，输入到模型的 prompt 是怎么组装的？哪些部分是必须注入的，哪些不是？”</p>
+      { "t": "02、输入到模型的 prompt 由哪些部分组成？", "tag": "技术派·携程", "p": "core", "html": `<p>“你做的 Agent，输入到模型的 prompt 是怎么组装的？哪些部分是必须注入的，哪些不是？”</p>
 <p>“prompt 组装用的是分层拼接，一共 9 层，按固定顺序拼进去。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727110803-5ab8d56e.png" decoding="async" loading="lazy" fetchpriority="low" width="1693" height="929"></p>
 <p>“前 4 层是静态的，整个会话期间不变。”</p>
@@ -2140,30 +2050,26 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“因为 Prompt Caching。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727110940-7039b291.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“Prompt Caching 会按最长公共前缀命中。前 4 层是静态内容，放在提示词最前面，每轮请求的前缀都一样，缓存命中率能拉到最高。如果把动态内容插到前面，前缀每轮都变，缓存基本不会中，token 成本会高出好几倍。”</p>` },
-      { "t": "03、你做的 coding agent 和 Claude Code 与 Codex 区别在哪？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>“Claude Code 是终端 Agent 的标杆。”</p>
+      { "t": "03、你做的 coding agent 和 Claude Code 与 Codex 区别在哪？", "tag": "技术派·携程", "p": "core", "html": `<p>“Claude Code 是终端 Agent 的标杆。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727111329-75af211d.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>但我在使用这些工具的过程中产生了一个疑问——这些工具底层到底是怎么工作的？</p>
 <p>它是怎么理解我的指令的、怎么决定该读哪个文件的、怎么判断该调用什么工具的、多轮对话的上下文它是怎么管理的。</p>
 <p>我发现如果我只会用这些工具但不理解它们的底层设计，遇到工具表现不好的时候（比如Agent选错了工具、上下文丢失了关键信息、生成的代码跟项目风格不一致）我只能试着换个说法重新问，而不能从原理层面判断问题出在哪里。</p>
 <p>所以我决定自己从零实现一个Agent CLI，把ReAct推理循环、Tool Calling、Memory管理、MCP协议这些核心模块都自己写一遍。</p>
 <p>做完之后我对Agent系统的每一层都有了源码级的理解，再回去用Claude Code的时候我能明显感觉到我对工具的驾驭能力提升了——我知道什么样的指令能让Agent更准确地理解我的意图、我知道在什么场景下应该手动压缩上下文、我知道怎么设计Tool的描述信息能提高调用准确率。</p>` },
-      { "t": "04、上下文压缩是怎么做的？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>老王往前倾了倾身子，继续问：“你提到了上下文压缩，具体是怎么做的？”</p>
+      { "t": "04、上下文压缩是怎么做的？", "tag": "技术派·携程", "p": "core", "html": `<p>老王往前倾了倾身子，继续问：“你提到了上下文压缩，具体是怎么做的？”</p>
 <p>“三层压缩，每一层处理不同粒度的内容。”</p>
 <p>“第一层是工具结果截断。单次工具返回的内容如果超过阈值——比如 grep 一下出来几千行——直接截断，保留首尾和关键信息，中间用摘要替代。这一层是即时生效的，工具一返回就处理。”</p>
 <p>“第二层是对话历史摘要。当整个对话的 token 数接近上下文窗口的上限时，保留最近几轮完整对话，把更早的历史用 LLM 做一次摘要压缩。摘要会保留四类关键信息：用户的核心诉求、Agent 已完成的操作、达成的共识、还没解决的待办。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727111512-07ad2c61.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
 <p>“第三层是紧急降级。如果摘要压缩之后 token 数还是超限，按优先级丢弃非核心上下文——Skills 索引、非关键记忆、项目记忆里优先级低的部分，给核心对话腾空间。”</p>` },
-      { "t": "05、为什么要采用三层压缩策略？每一层压缩的内容一致吗？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>“设计思路是粒度从细到粗，触发条件从宽到严。”</p>
+      { "t": "05、为什么要采用三层压缩策略？每一层压缩的内容一致吗？", "tag": "技术派·携程", "p": "core", "html": `<p>“设计思路是粒度从细到粗，触发条件从宽到严。”</p>
 <p>“第一层处理的是单条消息级别的冗余，触发条件最宽松——每次工具返回都会检查，超了就截。成本几乎为零，不需要调 LLM。”</p>
 <p>“第二层处理的是对话历史级别的膨胀，触发条件是 token 数超过上下文窗口的差不多 80%。200k 的窗口大概在 167k 左右触发。这一层要调一次 LLM 做摘要，有成本，所以不会太频繁。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727111759-b1580e56.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第三层是最后防线，只在前两层都不够用的时候才启动。丢弃的是可恢复的辅助信息——Skills 索引可以重新加载、项目记忆可以重新检索——核心对话内容不到万不得已不动。”</p>
 <p>“三层压缩的内容完全不一样。第一层压的是工具输出，第二层压的是对话历史，第三层丢的是辅助上下文。如果只用一层笼统地压缩，要么压得太早浪费上下文空间，要么压得太晚直接超限报错。”</p>` },
-      { "t": "06、压缩过度效果不理想，怎么发现，怎么处理？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>“靠两个信号。”</p>
+      { "t": "06、压缩过度效果不理想，怎么发现，怎么处理？", "tag": "技术派·携程", "p": "core", "html": `<p>“靠两个信号。”</p>
 <p>“第一个是行为异常。模型开始重复做已经做过的事情——比如读一个文件，明明十分钟前已经读过了，又读了一遍。或者模型直接说'我不太清楚之前讨论了什么'，这就是压缩把关键信息压丢了。”</p>
 <p>“第二个是任务成功率下降。同样类型的任务，之前能完成，压缩几轮之后开始失败，大概率是上下文丢了关键内容。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727111927-dabe1b1b.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
@@ -2171,8 +2077,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>第一，动态调整保留轮数。默认保留最近 3 轮不压缩，如果检测到异常，临时扩大到 5 轮。</p>
 <p>第二，关键信息标注。用户明确给出的需求、已确认的技术方案，标记为不可压缩，摘要的时候跳过。</p>
 <p>第三，压缩前备份原始历史，发现效果不好可以回滚到压缩前的状态，用更保守的策略重新压。</p>` },
-      { "t": "07、增量修改系统怎么做？需要重新注入哪些信息？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>“走的是 Plan 审查机制。”</p>
+      { "t": "07、增量修改系统怎么做？需要重新注入哪些信息？", "tag": "技术派·携程", "p": "core", "html": `<p>“走的是 Plan 审查机制。”</p>
 <p>“Agent 生成执行计划之后，用户可以审查。如果需要加新功能，用户选择'补充需求'，把新的需求描述传进去。系统拿着原计划和新需求一起交给规划器，让它重新生成一份计划。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727112049-6b8cf048.png" decoding="async" loading="lazy" fetchpriority="low" width="1694" height="929"></p>
 <p>“重新注入的信息有三块：原始任务描述、已完成步骤的摘要、新需求的补充说明。已完成的步骤不会重新执行，规划器基于当前进度来安排后续的步骤。”</p>
@@ -2181,8 +2086,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727112354-d9e51ccc.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“举个例子，原计划是'先创建数据库表，再写 CRUD 接口'。用户补充说'加一个缓存层'。这不是简单地在后面追加一个缓存任务——CRUD 接口的实现逻辑要改，读操作要先查缓存再查库，写操作要同步更新缓存。直接追加的话，前面已经写好的接口代码就不对了。”</p>
 <p>“重新规划让规划器看到全貌，重新安排依赖和执行顺序，避免后续步骤建立在错误的前提上。”</p>` },
-      { "t": "08、工具调用的流程是怎样的？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>老王翻了一页笔记，继续问：“工具调用这块讲讲，完整流程是什么？”</p>
+      { "t": "08、工具调用的流程是怎样的？", "tag": "技术派·携程", "p": "core", "html": `<p>老王翻了一页笔记，继续问：“工具调用这块讲讲，完整流程是什么？”</p>
 <p>“三个阶段。”</p>
 <p>“第一阶段，LLM 生成 tool_call。模型看到工具的 schema 定义之后，根据当前任务决定调哪个工具、传什么参数，输出一个结构化的 tool_call 请求。”</p>
 <p>“第二阶段，策略审批。写操作（改文件、跑命令）会过一道安全检查——路径是否在允许范围内、命令是否在黑名单里。需要用户确认的操作会暂停等审批通过。”</p>
@@ -2222,8 +2126,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
  </tbody>
 </table>
 <p>“Tool 是手，Skill 是脑子里的经验。你不能用经验代替手去拧螺丝，也不能用手代替经验去判断该拧哪颗。两个是互补关系，不是替代关系。”</p>` },
-      { "t": "09、讲讲你的 Skills 有哪些？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>“核心设计思路是渐进式披露，分三层加载。”</p>
+      { "t": "09、讲讲你的 Skills 有哪些？", "tag": "技术派·携程", "p": "core", "html": `<p>“核心设计思路是渐进式披露，分三层加载。”</p>
 <p>“第一层是索引。只把 Skill 的名称和一句话描述放进 system prompt，控制在 4KB 以内，最多 20 个 Skill。这一层常驻上下文，成本很低。”</p>
 <p>“第二层是正文。LLM 看到索引后，判断当前任务需要哪个 Skill，调一个 load_skill 工具把完整指令拿进来，单个 Skill 正文上限 5KB。加载进来的 Skill 放在一个 LRU 缓冲区里，最多同时持有 3 个，超出的按最久未使用淘汰。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727112949-36d73526.png" decoding="async" loading="lazy" fetchpriority="low" width="1536" height="1024"></p>
@@ -2231,8 +2134,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <h4>为什么不一次性全量加载？</h4>
 <p>因为 system prompt 越长，Prompt Caching 命中率越低。绝大多数对话只会用到一两个 Skill，全量加载等于让用户为用不到的内容付 token 成本。</p>
 <p>“Skill 来源有三个优先级：内置的、用户级的、项目级的，从低到高覆盖。项目级的 Skill 可以覆盖内置同名 Skill 的行为，不用改源码。”</p>` },
-      { "t": "10、工具调用时模型用了几次？Skill 用了几次？", "tag": "技术派·携程", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·携程", "p": "core", "html": `<p>“这个跟任务复杂度有关，说个典型场景。”</p>
+      { "t": "10、工具调用时模型用了几次？Skill 用了几次？", "tag": "技术派·携程", "p": "core", "html": `<p>“这个跟任务复杂度有关，说个典型场景。”</p>
 <p><img src="assets/jimg/agent-mianshi-xiecheng-20260727113148-2b04c0c6.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“比如'帮我在项目里加一个分页接口'这种任务，模型差不多要调 10 到 15 次工具——读项目结构、读已有接口代码、读数据库模型、写新接口、写测试、跑测试、修 bug，每一步都是一次工具调用。Skill 的话，可能就加载了一个代码规范相关的 Skill，一次。”</p>
 <p>“工具调用频率远高于 Skill 加载，差不多 10:1 到 20:1 的比例。这也是为什么 Skill 要做渐进式加载——使用频率不像工具那么高，没必要全部常驻上下文。”</p>
@@ -2269,7 +2171,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 
   mine.chapters.push({
     "no": "13",
-    "title": "技术派·阿里 · Agent面经（20 题）",
+    "title": "技术派·阿里 · Agent面经（11 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>说实话，我自己也是Qoder系列产品的重度使用者，感觉确实发展快。</p>
 <p>一开始，我看有些小伙伴反馈嫌贵，单由于接的是某海外顶级模型，价格比国内模型肯定贵一些。</p>
@@ -2296,8 +2198,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/agent-mianshi-ali-20260730114513-4f1ceb8e.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>（全文比较肝，保证大家能学到很多很多，系好安全带，我们粗粗粗粗发～）</p>
 <h2>场景题</h2>` },
-      { "t": "在淘天高并发场景下，将 Agent Demo 改造为能支撑“双十一”级别流量的生产系统，最大的架构挑战是什么？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王翻了翻简历上的项目经历，开口就是一个很难的场景题：“假设你来我们淘天，要把一个实验性质的 Agent Demo 改造成能扛双十一的生产系统，你觉得最大的架构挑战是什么？”</p>
+      { "t": "在淘天高并发场景下，将 Agent Demo 改造为能支撑“双十一”级别流量的生产系统，最大的架构挑战是什么？", "tag": "技术派·阿里", "p": "core", "html": `<p>老王翻了翻简历上的项目经历，开口就是一个很难的场景题：“假设你来我们淘天，要把一个实验性质的 Agent Demo 改造成能扛双十一的生产系统，你觉得最大的架构挑战是什么？”</p>
 <p>“最大的挑战是 LLM API 会成为单点瓶颈。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730114737-a7698169.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“传统微服务扛流量的思路是水平扩容——流量大了加实例，实例不够加节点。但 Agent 系统的核心依赖是 LLM API 调用，这东西有三个特性让它没法用传统思路来扩。”</p>
@@ -2315,8 +2216,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/agent-mianshi-ali-20260730115151-a6d6eb80.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“假设 LLM 端点的 RPM 上限是 1 万次/分钟，你扩 10 个 实例 还是 100 个 实例，能发出去的请求总量没变。100 个 实例 只是让更多线程同时排队，排队速度不会变快。”</p>
 <p>“真正能提升吞吐的是减少 LLM 调用次数——语义缓存、模型分级、规则引擎前置——把有限的额度留给真正需要大模型推理的请求。”</p>` },
-      { "t": "01、在构建 Agent 框架时，选择 LangChain/LlamaIndex 还是自研？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王端起茶杯抿了一口：“框架选型这块，你怎么看 LangChain 这类开源框架和自研？”</p>
+      { "t": "01、在构建 Agent 框架时，选择 LangChain/LlamaIndex 还是自研？", "tag": "技术派·阿里", "p": "core", "html": `<p>老王端起茶杯抿了一口：“框架选型这块，你怎么看 LangChain 这类开源框架和自研？”</p>
 <p>“这个问题我有实际经验。PaiCLI 的核心 Agent 循环是自研的，基于 Spring AI 做模型层抽象。另一个项目 PaiAgent 用了 LangGraph4j 做复杂的 DAG 工作流编排。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730120627-d7099a27.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“先说 LangChain 的优势。生态是真的强，500 多个集成，向量数据库、模型提供商、工具连接器几乎全覆盖。做 POC 验证想法，差不多两三天就能出一个能跑通的 Demo。社区活跃，遇到问题基本都能搜到解法。”</p>
@@ -2327,8 +2227,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/agent-mianshi-ali-20260730120820-a4072495.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“自研的优势是完全掌控每一步。调试直接看自己的代码，性能瓶颈知道在哪，迭代节奏自己定。况且现在 Agent 的 Coding 能力已经很强了，完全不用担心自研。”</p>
 <p>“我的判断——做技术验证和快速原型，用框架。做生产系统，核心自己写，框架当工具库用。”</p>` },
-      { "t": "02、如何控制 Agent 的自主性边界？如何设计安全护栏？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>“自主性边界的核心原则——确定性的规则走规则引擎，模糊的地方交给 LLM 判断，高风险动作交给人工审批。”</p>
+      { "t": "02、如何控制 Agent 的自主性边界？如何设计安全护栏？", "tag": "技术派·阿里", "p": "core", "html": `<p>“自主性边界的核心原则——确定性的规则走规则引擎，模糊的地方交给 LLM 判断，高风险动作交给人工审批。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730121031-a3ea383b.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“拿退换货场景举例。‘7 天无理由退货’是确定性规则——在时间窗口内、商品未拆封，直接走退货流程，不需要 Agent 做任何推理。这类场景用规则引擎处理，速度快、结果一致、成本为零。”</p>
 <p>“‘商品有轻微使用痕迹，用户申请退货’是模糊地带——需要 Agent 根据图片判断损坏程度、参考历史类似案例、结合用户信誉评分，给出一个建议。”</p>
@@ -2342,8 +2241,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“因为 LLM 是概率模型，同样的输入不保证同样的输出。”</p>
 <p>“在退换货场景下，同一个退货申请，Agent 第一次可能回复‘符合政策，已提交退款’，第二次可能回复‘建议您联系人工客服进一步确认’。如果涉及到真金白银的退款操作，这种不确定性是不可接受的。”</p>
 <p>“概率模型处理需要判断力的部分，规则引擎处理需要一致性的部分，人工兜底处理需要承担责任的部分。三者各管各的，边界清晰。”</p>` },
-      { "t": "03、Agent 的幻觉和不合规内容，在工程层面有哪些控制和拦截机制？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王推了推眼镜：“幻觉问题大家都知道，我想听的是工程层面怎么落地。”</p>
+      { "t": "03、Agent 的幻觉和不合规内容，在工程层面有哪些控制和拦截机制？", "tag": "技术派·阿里", "p": "core", "html": `<p>老王推了推眼镜：“幻觉问题大家都知道，我想听的是工程层面怎么落地。”</p>
 <p>“分两个阶段，生成前和生成后。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730121536-0617bad1.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“生成前的核心手段是 RAG。把相关的事实性内容从知识库检索出来，注入到上下文里。模型基于提供的证据回答，减少幻觉的发生。”</p>
@@ -2355,8 +2253,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“第二道，引用核实。模型如果声称‘根据退换货政策第三条’，就去验证这一条是否真实存在、内容是否匹配。”</p>
 <p>“第三道，模型裁判（LLM-as-Judge）。用另一个模型审查回复的事实准确性。成本不高，因为审查用的 prompt 比生成用的 prompt 短得多。”</p>
 <p>“第四道，置信度兜底。如果模型输出的 logprob（每个 token 的对数概率，反映模型对自己答案的把握程度）低于阈值，说明模型自己也拿不准，这条回复直接转人工。”</p>` },
-      { "t": "04、为 Agent 增加“通过商品图片找同款”的多模态能力，后端架构需要哪些改造？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王看了一眼简历上的技术栈：“业务方提了个需求，用户拍一张商品图片，Agent 帮忙找同款。你的后端架构要怎么改？”</p>
+      { "t": "04、为 Agent 增加“通过商品图片找同款”的多模态能力，后端架构需要哪些改造？", "tag": "技术派·阿里", "p": "core", "html": `<p>老王看了一眼简历上的技术栈：“业务方提了个需求，用户拍一张商品图片，Agent 帮忙找同款。你的后端架构要怎么改？”</p>
 <p>“改动集中在四个模块。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730122018-3870c9a5.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第一，新增图片处理流程。前端上传图片后，后端先做预处理——格式校验，只接受 JPEG、PNG、WebP。大小限制在 5MB 以内。分辨率做好校验，太大的缩放到标准尺寸，避免耗时过长。”</p>
@@ -2369,22 +2266,19 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“纯文本检索常用的 Embedding 模型，比如千问 Embedding，和 CLIP 的文本编码器产出的向量，虽然维度可能相同，但向量空间的语义结构完全不同。把它们扔进同一个索引算余弦相似度，得到的分数没有实际意义。”</p>
 <p>“CLIP 本身确实能做跨模态检索——用文字查图片，或者用图片查文字——因为它自己的文本编码器和图片编码器在同一个空间里。但这种映射只限于 CLIP 自己的编码器对，不能和其他模型的向量混在一起。”</p>
 <p>“生产环境的做法是维护多套索引——纯文本检索走 BGE 索引精度更高，图片检索和跨模态检索走 CLIP 索引，最终在应用层做结果融合和重排序。”</p>` },
-      { "t": "05、如何保持技术敏锐度并学习一项新技术？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王换了个方向：“聊聊你个人。怎么保持技术敏锐度的？”</p>
+      { "t": "05、如何保持技术敏锐度并学习一项新技术？", "tag": "技术派·阿里", "p": "core", "html": `<p>老王换了个方向：“聊聊你个人。怎么保持技术敏锐度的？”</p>
 <p>“三个习惯——筛选信息源、动手验证、输出倒逼输入。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730122601-4f364870.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“信息源我固定关注三个渠道。GitHub Trending 每天刷半个小时，一周涨 1000 星以上的大概率有真东西。X 上关注了一批一线开发者的账号，看他们每天在研究什么新鲜的东西。”</p>
 <p>“看到一个新框架或者新工具，我会做一个最小可用的东西出来。比如第一次接触 MCP 协议的时候，花一个半小时写了一个 MCP Server 的简单实现，跑通之后对协议的理解更深了。”</p>
 <p>“最后是输出。写一篇文章或者在团队内部做一次分享。写的过程中会发现自己哪里理解得模棱两可，倒逼你把细节搞清楚。”</p>` },
-      { "t": "06、和团队成员在技术方案上产生严重分歧时怎么处理？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>“真碰到过。之前在选搜索方案的时候，我主张用 Elasticsearch 做混合搜索，同学认为纯向量数据库就够了。”</p>
+      { "t": "06、和团队成员在技术方案上产生严重分歧时怎么处理？", "tag": "技术派·阿里", "p": "core", "html": `<p>“真碰到过。之前在选搜索方案的时候，我主张用 Elasticsearch 做混合搜索，同学认为纯向量数据库就够了。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730122803-e2a1da73.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>我的解决方案是。</p>
 <p>“第一步，把争论变成可量化的对比。我们各自跑了一组查询测试，ES 混合搜索的召回率明显比纯向量高，但查询延迟也更长。数据摆出来之后，争论的焦点就从‘谁的方案好’变成了‘召回率和延迟哪个更重要’。”</p>
 <p>“第二步，找第三方确认优先级。另外一个同学说在他们的场景下搜不到比搜得慢严重得多，召回率优先。方案就定了。”</p>
 <p>“核心是把观点变成数据，把判断权交给业务约束，限时做决定。”</p>` },
-      { "t": "07、AI Native 应用与传统软件工程在开发模式上有什么差异？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王转了转无名指上的戒指：“你怎么看 AI Native 和传统开发的差异？”</p>
+      { "t": "07、AI Native 应用与传统软件工程在开发模式上有什么差异？", "tag": "技术派·阿里", "p": "core", "html": `<p>老王转了转无名指上的戒指：“你怎么看 AI Native 和传统开发的差异？”</p>
 <p>“三个差异。”</p>
 <p><img src="assets/jimg/agent-mianshi-ali-20260730123137-c53e4f1e.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第一，确定性变成了概率性。传统服务，同样的输入永远返回同样的输出，测试写断言就行。AI 应用，同样的 prompt 每次可能返回不同的结果。测试方法得从断言转向评估——准确率、相关性评分、人工抽检一致率。”</p>
@@ -2393,8 +2287,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <h4>优秀的 AI 应用研发工程师应该具备哪些素质？</h4>
 <p>“工程能力，这个没变。但还需要对模型行为有判断的直觉——你得知道‘这个 prompt 大概率能让模型给出什么样的回复’，知道‘这类任务用 ReAct 模式比纯生成靠谱’。这种直觉是靠大量实践积累的。”</p>
 <p>“还有一个容易被忽视的——评估思维。做任何 AI 功能，第一步应该是定义‘什么算好’，而不是直接开始写代码。没有评估标准，改了也不知道是变好了还是变差了。”</p>` },
-      { "t": "08、最近读过的一本技术书籍是什么？", "tag": "技术派·阿里", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·阿里", "p": "core", "html": `<p>老王看了一眼手表：“最后一个问题。最近读过的一本技术书，给你带来的最大启发是什么？”</p>
+      { "t": "08、最近读过的一本技术书籍是什么？", "tag": "技术派·阿里", "p": "core", "html": `<p>老王看了一眼手表：“最后一个问题。最近读过的一本技术书，给你带来的最大启发是什么？”</p>
 <p>“最近重读了 Chip Huyen 的《Designing Machine Learning Systems》。”</p>
 <p></p>
 <figure><img src="assets/jimg/agent-mianshi-ali-20260730123425-8067f368.png" alt="纯装逼环节" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941">
@@ -2428,7 +2321,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 
   mine.chapters.push({
     "no": "14",
-    "title": "技术派·海康威视 · Agent评测面经（32 题）",
+    "title": "技术派·海康威视 · Agent评测面经（17 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>简单给大家科普下。</p>
 <p>如有错误和遗漏，还请大家指出（我超爱学习的～</p>
@@ -2462,8 +2355,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <blockquote>
  <p>文中涉及的PaiCLI Agent 已经开源到GitHub，Go版本也有：<a href="https://github.com/itwanger/PaiCLI-Python">https://github.com/itwanger/PaiCLI-Python</a></p>
 </blockquote>` },
-      { "t": "01、对 Agent 自进化的理解", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王低头翻着我的简历，无名指上的戒指碰到纸面，发出轻轻的响声。翻到第二页停了下来：“Agent 自进化，你展开聊聊？”</p>
+      { "t": "01、对 Agent 自进化的理解", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王低头翻着我的简历，无名指上的戒指碰到纸面，发出轻轻的响声。翻到第二页停了下来：“Agent 自进化，你展开聊聊？”</p>
 <p>“自进化的核心是——不改模型权重，在应用层让 Agent 自己变好。”</p>
 <h4>和 fine-tuning 的区别在哪？</h4>
 <p>fine-tuning 要收集标注数据、跑训练、部署新模型，周期长、成本高。</p>
@@ -2473,8 +2365,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>第一条，Prompt 进化。Agent 跑完一批任务后，分析失败的执行轨迹，提取反复出现的失败模式，自动生成新的约束规则写入 system prompt。比如发现模型经常在多文件编辑时漏掉某个文件，就补一条“多文件编辑前先用工具列出所有需要修改的文件清单”。</p>
 <p>第二条，工具链优化。记录成功任务的工具调用序列，发现某些工具组合的成功率特别高，下次遇到类似任务优先走验证过的路径。</p>
 <p>第三条，知识库增量。把解决过的问题和方案结构化存入长期记忆。下次遇到同类问题，先检索经验库，不用从零开始推理。</p>` },
-      { "t": "02、自进化产物的提取标准和质量评估", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“提取标准有三条。”</p>
+      { "t": "02、自进化产物的提取标准和质量评估", "tag": "技术派·海康威视", "p": "core", "html": `<p>“提取标准有三条。”</p>
 <p>“第一，任务最终成功了。只有成功的执行轨迹才值得提取。失败的轨迹是反面教材，用来生成约束规则，不用来生成推荐路径。”</p>
 <p>“第二，效率高于基线。同样的任务，如果这次用了更少的步骤或更少的 token 就完成了，说明这条路径有优化价值。”</p>
 <p>“第三，用户认可。Agent 的回答用户接受了、代码提交了、没有要求修改，这些隐式信号也算认可。”</p>
@@ -2484,8 +2375,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“结果维度——提取出来的经验，拿去跑同类任务，成功率有没有提升。这个要实测，不能凭感觉。”</p>
 <p>“泛化维度——这条经验换个场景还管不管用。如果只对某个特定 case 有效，换个项目就不行，那就是过于耦合了，价值不大。”</p>
 <p>“可解释维度——提取出来的规则，人类能不能看懂、能不能审核。不可解释的经验不能放进 system prompt，因为你不知道它为什么有效，也不知道它什么时候会失效。”</p>` },
-      { "t": "03、数据从哪来？怎么判断高质量数据？", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王端起茶杯喝了一口：“用于做 Agent 自进化的数据从哪来？”</p>
+      { "t": "03、数据从哪来？怎么判断高质量数据？", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王端起茶杯喝了一口：“用于做 Agent 自进化的数据从哪来？”</p>
 <p>“三个来源。”</p>
 <p>“第一个，生产环境的真实执行轨迹。这是最有价值的数据，因为是真实用户在真实场景下的真实任务。每一轮 Agent 和用户的交互都会记录成不可变的 JSONL 日志，包括 LLM 消息、工具调用、执行结果、耗时。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803110558-5a977cb3.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
@@ -2500,13 +2390,11 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
  <li>无副作用——没有误删文件、没有执行危险命令，</li>
  <li>可泛化——不是针对特定文件路径或特定项目结构的 hack。四个条件都满足，才算高质量。</li>
 </ul>` },
-      { "t": "04、为什么在沙箱环境做自进化？", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“第一，安全。自进化过程中 Agent 会尝试新策略，新策略可能有副作用——删错文件、执行错误命令、改坏代码。在沙箱里犯错不影响真实环境。”</p>
+      { "t": "04、为什么在沙箱环境做自进化？", "tag": "技术派·海康威视", "p": "core", "html": `<p>“第一，安全。自进化过程中 Agent 会尝试新策略，新策略可能有副作用——删错文件、执行错误命令、改坏代码。在沙箱里犯错不影响真实环境。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803111111-292d9076.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第二，可复现。每次实验从同一个干净状态出发，变量只有 Agent 的策略差异，结果才有可比性。如果在真实环境跑，上一次实验的残留会污染下一次，不知道效果提升是策略的功劳还是环境碰巧有利。”</p>
 <p>“第三，可逆向。策略不好就回滚快照从头再来，成本很低。真实环境里把代码改坏了，回滚的代价要大得多。”</p>` },
-      { "t": "05、快照的选择时机", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“你提到快照和回滚，那快照在什么时机做？”</p>
+      { "t": "05、快照的选择时机", "tag": "技术派·海康威视", "p": "core", "html": `<p>“你提到快照和回滚，那快照在什么时机做？”</p>
 <p>“第一个，每一轮自进化迭代开始前，做一次全量快照。这是 baseline（基准状态），不管后面发生什么，都能回到这个干净状态。我的做法是用独立的 Git 仓库做快照管理，和用户项目的 .git 完全隔离。每次 Agent 开始执行前自动做一次 pre-turn（执行前）快照。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803111448-b59857bb.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第二个，每次 Agent 执行完一个完整任务后，做增量快照。这是 checkpoint（检查点），记录阶段性成果。post-turn（执行后）快照放在后台异步写入，不阻塞主流程。”</p>
@@ -2514,8 +2402,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <h4>触发方式</h4>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803111739-19fbeea7.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“两种方式配合用。定时快照按迭代周期自动触发，事件驱动快照在特定事件——任务完成、错误发生、高风险操作——触发。快照文件的权限严格限制为当前用户可读写，其他用户不可访问。”</p>` },
-      { "t": "06、沙箱的安全性和隔离", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“沙箱的安全性你了解吗？它是怎么做隔离的？”</p>
+      { "t": "06、沙箱的安全性和隔离", "tag": "技术派·海康威视", "p": "core", "html": `<p>“沙箱的安全性你了解吗？它是怎么做隔离的？”</p>
 <p>“第一层，文件系统隔离。沙箱有独立的工作目录，Agent 的所有文件操作限定在这个目录内。靠路径白名单阻止越界访问——要读项目目录之外的文件，直接拦截。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803112130-d2566dd3.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第二层，进程隔离。Agent 执行的 shell 命令在独立的进程空间运行，CPU 和内存有上限，超时自动 kill。一个跑错了的命令不会把整台机器拖垮。”</p>
@@ -2523,16 +2410,14 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <h4>容器还是虚拟机？</h4>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803112405-4d869dc3.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“取决于安全要求。大部分 Agent 自进化场景用容器就够了——Linux namespace（命名空间）加 cgroup（资源控制组），启动快、开销小，隔离粒度够用。如果对安全要求特别高，比如运行不可信的第三方代码，那就上虚拟机，隔离更彻底但启动慢。”</p>` },
-      { "t": "07、评测体系怎么做？", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王推了推眼镜，端起茶杯抿了一口，放下来看着我：“你的评测体系是怎么做的？”</p>
+      { "t": "07、评测体系怎么做？", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王推了推眼镜，端起茶杯抿了一口，放下来看着我：“你的评测体系是怎么做的？”</p>
 <p>“结果层看任务成功率。前提是评测环境可复位，每次都从同一个状态出发，上一次运行的副作用不能污染下一次。”</p>
 <p>“过程层看效率。完成同一个任务用了多少步、消耗了多少 token、工具调用成功率多少。两个 Agent 都能完成任务，一个用 3 步，一个用 12 步，差距一目了然。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803112849-cd40d4a5.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“同一个任务跑多次，结果应该基本一致。如果跑 10 次有 3 次失败，说明这条路径不稳定，需要排查。”</p>
 <p>“评测的基础设施有两个。一个是 Golden Set——一组确定性测试用例，每条有明确的输入和预期输出。比如代码搜索模块的 Golden Set，每条定义了输入 query 和预期命中的文件位置，跑一遍就知道搜索功能有没有回退。”</p>
 <p>“另一个是 LLM-as-Judge（模型裁判）。定义评分标准，让模型按标准给 Agent 的产出打分。好处是成本低、速度快，能覆盖大批量样本。但模型裁判也会漂移，需要定期人工校准——随机抽一批模型打过分的样本，人工复审，算一致率。”</p>` },
-      { "t": "08、Harness 层怎么构建？", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“第一，验证循环。Agent 写完代码不能直接交付，先跑测试，发现问题自动修复，修完再验，通过了才算完成。”</p>
+      { "t": "08、Harness 层怎么构建？", "tag": "技术派·海康威视", "p": "core", "html": `<p>“第一，验证循环。Agent 写完代码不能直接交付，先跑测试，发现问题自动修复，修完再验，通过了才算完成。”</p>
 <p>“第二，错误恢复。工具调用报错了——API 超时、参数格式不对——自动重试，换一个可行的方案。Agent 进入死循环了，超时打断，回到上一个稳定状态。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803113124-9d3c6983.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第三，权限控制。删文件、推送代码、执行系统命令，这类操作要么走人工确认，要么有策略限制。路径安全检查阻止 Agent 访问项目目录之外的文件，命令安全检查拦截危险的 shell 命令。所有审批结果都写入审计日志——按天分文件的 JSONL 格式，记录工具名、参数、审批结果、审批方式、耗时。”</p>
@@ -2542,50 +2427,43 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“我们的评测框架设计了三条独立的分析通道，并行执行。”</p>
 <p>“第一条分析会话证据——这轮对话里 Agent 做了什么、调了哪些工具、模式切换了几次。第二条检查项目交付信号——有没有测试文件、有没有 CI 配置、有没有指导文档。第三条清点 Agent 的定制化配置——启用了哪些 Skill、有哪些提示词文件、MCP 配置和安全策略。”</p>
 <p>“三条通道各自独立收集证据，最后由主模型汇总三条通道的调研结果，输出综合报告。好处是每条通道可以独立迭代，改一条不影响其他两条。”</p>` },
-      { "t": "09、举实际例子改进评测", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“举个实际例子，你是怎么从头到尾改进评测的？”</p>
+      { "t": "09、举实际例子改进评测", "tag": "技术派·海康威视", "p": "core", "html": `<p>“举个实际例子，你是怎么从头到尾改进评测的？”</p>
 <p>“拿代码搜索功能来说。”</p>
 <p>“初始状态是纯手动测试。写完搜索功能，自己试几个 query，看看结果对不对。当然了，我能想到的 query 有限，而且每次改完代码都要手动测一遍。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803114004-11ad85ed.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“后面调整了搜索的 prompt，自己测了几个常用 query 没问题就发布了。结果用户反馈某类文件搜不到了。回头排查发现，prompt 改动影响了搜索工具的参数构造，导致特定模式的 query 回退了。”</p>
 <p>“从那以后我就开始构建 Golden Set。第一版只有几条用例，覆盖最基本的搜索场景。后来每次遇到 bug 或用户反馈，就把它加进去。现在的用例覆盖了未知命令处理、并行工具执行、文件引用解析等多种场景。”</p>
 <p>“每条用例定义输入 query 和预期命中的文件位置，用 JUnit 跑，跑一遍就知道哪些过了、哪些挂了。改 prompt 之前先跑一遍，改完再跑一遍，对比结果。”</p>` },
-      { "t": "10、评测 Harness 的目的", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王看了一眼手表：“你做评测 Harness 的目的到底是什么？”</p>
+      { "t": "10、评测 Harness 的目的", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王看了一眼手表：“你做评测 Harness 的目的到底是什么？”</p>
 <p>“让改动有据可查，让回退能被发现。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803114303-d0bcb330.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“没有评测体系的时候，每次改 prompt 都是凭感觉——'感觉更好了''好像没问题'。改了三个月之后，你都不知道 Agent 比三个月前是变好了还是变差了。”</p>
 <p>“有了评测体系，改一行 prompt 就跑一遍测试集，数字告诉你哪些能力提升了、哪些回退了。回退了就不发布，先修 bug。”</p>
 <p>“prompt 也是代码，改了就要跑测试。”</p>` },
-      { "t": "11、评测体系如何和业务场景结合？", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“核心做法是从真实用户的任务里抽取测试用例。”</p>
+      { "t": "11、评测体系如何和业务场景结合？", "tag": "技术派·海康威视", "p": "core", "html": `<p>“核心做法是从真实用户的任务里抽取测试用例。”</p>
 <p>“第一步，从审计日志和会话日志里筛选高频任务类型——代码搜索、文件编辑、命令执行、多轮对话。”</p>
 <p>“第二步，每个类型挑有代表性的 case，包括正常情况和边界情况。正常情况是大多数用户的常见操作，边界情况是容易出错的场景。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803114620-02784433.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第三步，分场景组织评测。代码搜索场景跑 Golden Set，文件编辑场景跑回归用例，安全场景跑权限边界测试。每个场景独立打分，整体报告里汇总。”</p>
 <p>“还有一个做法是线上轨迹回放。把线上记录的真实会话在评测环境里重新跑一遍，对比输出差异。能发现那些人工构造用例覆盖不到的场景。”</p>` },
-      { "t": "12、评测维度和标准", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“四个维度。”</p>
+      { "t": "12、评测维度和标准", "tag": "技术派·海康威视", "p": "core", "html": `<p>“四个维度。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803114921-37aa5fd6.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“正确性——任务结果是否符合预期。确定性任务直接对比预期输出，开放性任务用模型裁判按评分标准打分，定期人工校准。”</p>
 <p>“效率——完成任务用了多少步、消耗了多少 token。同样的任务，步骤越少、token 越少，Agent 越高效。”</p>
 <p>“安全性——Agent 有没有执行危险操作、有没有越权访问。靠审计日志统计，看有没有被拦截的记录，被拦截的原因是什么。”</p>
 <p>“稳定性——同一个任务跑多次，结果的一致性。每个用例跑多次，计算成功率。”</p>` },
-      { "t": "13、为什么用 Go 重写 Agent？", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王翻回简历第一页，手指点了一下某个位置：“PaiCLI Agent 这个项目，你为什么用 Go 重写？”</p>
+      { "t": "13、为什么用 Go 重写 Agent？", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王翻回简历第一页，手指点了一下某个位置：“PaiCLI Agent 这个项目，你为什么用 Go 重写？”</p>
 <p>“PaiCLI Agent 最初是 Python 写的，后来我发现贵司，也就是我的目标公司，主语言是Go，所以我就重写了。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803115201-b05a3e59.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>当然了，Python和Go版确实也存在一些差异。</p>
 <p>“第一，部署。Go 编译出来就是一个二进制文件，拷贝过去直接跑，零依赖。”</p>
 <p>“第二，并发。Agent 的工具调用经常需要并行——同时搜索多个文件、同时调用多个 API。Go 的 goroutine 做并行很自然，起几千个 goroutine 也没有压力。”</p>
 <p>“第三，启动速度。终端 Agent 是 CLI 工具，用户输入一条命令就要立刻响应。Go 编译后的二进制启动是毫秒级。”</p>` },
-      { "t": "14、Go 重写遇到什么问题？", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>“最大的问题是 AI SDK 生态不成熟。Python 有 LangChain、LlamaIndex、各家模型厂商的官方 SDK，Go 这边对应的库要么没有，要么功能不全。很多东西得自己封装——模型调用、流式响应解析、tool_call 协议处理，都得从头写。”</p>
+      { "t": "14、Go 重写遇到什么问题？", "tag": "技术派·海康威视", "p": "core", "html": `<p>“最大的问题是 AI SDK 生态不成熟。Python 有 LangChain、LlamaIndex、各家模型厂商的官方 SDK，Go 这边对应的库要么没有，要么功能不全。很多东西得自己封装——模型调用、流式响应解析、tool_call 协议处理，都得从头写。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803115616-e85cccee.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第二个是系统的差异。Python 的字典可以随便嵌套，schema 对不上也能跑。Go 是静态类型，模型返回的 JSON 必须提前定义好结构体。tool_call 的参数格式每个工具都不一样。”</p>
 <p>“第三个是错误处理风格。Python 用 try/except 一把梭。Go 的 error 要逐层处理、逐层传递。”</p>` },
-      { "t": "15、模块和依赖关系", "tag": "技术派·海康威视", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王把眼镜摘下来擦了擦，重新戴上：“最后一个问题。把模块和模块之间的依赖关系说一下。”</p>
+      { "t": "15、模块和依赖关系", "tag": "技术派·海康威视", "p": "core", "html": `<p>老王把眼镜摘下来擦了擦，重新戴上：“最后一个问题。把模块和模块之间的依赖关系说一下。”</p>
 <p>“核心模块分六个。”</p>
 <p><img src="assets/jimg/haikang-agent-eval-mianshi-20260803120640-bd7af005.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“CLI 层负责终端交互——命令解析、输入输出、界面渲染，是用户直接接触的入口。”</p>
@@ -2618,7 +2496,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 
   mine.chapters.push({
     "no": "15",
-    "title": "技术派·长鑫存储 · Agent面经（22 题）",
+    "title": "技术派·长鑫存储 · Agent面经（12 题）",
     "questions": [
       { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>看到这样一则爆料，挺有意思。</p>
 <blockquote>
@@ -2640,33 +2518,28 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <blockquote>
  <p>文中涉及的PaiCLI Agent 已经开源到GitHub，Go版本也有：<a href="https://github.com/itwanger/PaiCLI-Python">https://github.com/itwanger/PaiCLI-Python</a></p>
 </blockquote>` },
-      { "t": "01、Agent 系统中的 Memory，与计算机硬件中的 DRAM 有什么联系？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王推了推眼镜，翻了翻简历。“开门见山问一个基础的。Agent 系统中的 Memory，和计算机硬件中的 DRAM，有什么联系？”</p>
+      { "t": "01、Agent 系统中的 Memory，与计算机硬件中的 DRAM 有什么联系？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王推了推眼镜，翻了翻简历。“开门见山问一个基础的。Agent 系统中的 Memory，和计算机硬件中的 DRAM，有什么联系？”</p>
 <p>“DRAM 是物理存储介质，按地址读写，断电数据就没了。它不关心存的是什么内容，只负责往指定地址写入、从指定地址读取。”</p>
 <p>“Agent Memory 是软件抽象层，按语义检索，可以选择持久化到磁盘或数据库。它关心的是‘记住什么、什么时候该想起来用’。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804122227-712250b7.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“主板上插了多大的内存条 DRAM 的容量就多大。Agent Memory 的容量受上下文窗口限制，但可以把事实记忆存到磁盘，需要的时候再检索回来注入上下文。”</p>` },
-      { "t": "02、大模型上下文变长后，为什么 KV Cache 会快速占用显存和内存？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“KV Cache 是 Transformer 推理时的核心缓存。每生成一个新 token，模型都要回顾之前所有 token 的 Key 和 Value 向量来计算注意力。如果每次都重新算，计算量会随序列长度平方增长。KV Cache 的做法是把已经算过的 Key 和 Value 缓存下来，新 token 只需要算自己的 Query，然后和缓存里的 Key、Value 做注意力计算。”</p>
+      { "t": "02、大模型上下文变长后，为什么 KV Cache 会快速占用显存和内存？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“KV Cache 是 Transformer 推理时的核心缓存。每生成一个新 token，模型都要回顾之前所有 token 的 Key 和 Value 向量来计算注意力。如果每次都重新算，计算量会随序列长度平方增长。KV Cache 的做法是把已经算过的 Key 和 Value 缓存下来，新 token 只需要算自己的 Query，然后和缓存里的 Key、Value 做注意力计算。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804122532-fec7a653.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“占用之所以大，是因为 KV Cache 的体积和序列长度成正比。”</p>
 <p>“具体来说，KV Cache 的大小等于 2 乘以模型层数、乘以 KV 头数、乘以每个头的维度、乘以序列长度、乘以 batch size、再乘以每个元素的字节数。”</p>
 <p>“以一个 70B 参数的模型为例。假设 80 层，用 GQA（Grouped Query Attention，分组查询注意力）做了优化，8 个 KV 头，每个头 128 维，BF16（半精度浮点）精度下每个元素 2 字节。单个 token 的 KV Cache 占用大约 320KB。上下文 4K 的时候差不多 1.3GB，到 128K 就飙到大约 40GB——接近模型权重本身的大小了。”</p>
 <p>“如果同时服务多个用户，每个用户一份独立的 KV Cache，再乘以 batch size。这就是为什么长上下文加上高并发的场景下，KV Cache 会成为显存和内存的最大消耗者。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804122919-af11c817.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>` },
-      { "t": "03、大模型推理什么时候是算力瓶颈，什么时候是内存带宽瓶颈？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王端起茶杯喝了口水。“接着上一题，推理的瓶颈不是一直不变的。什么时候卡算力，什么时候卡带宽？”</p>
+      { "t": "03、大模型推理什么时候是算力瓶颈，什么时候是内存带宽瓶颈？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王端起茶杯喝了口水。“接着上一题，推理的瓶颈不是一直不变的。什么时候卡算力，什么时候卡带宽？”</p>
 <p>“第一个阶段叫预填充（Prefill），就是处理用户输入的整段 prompt。这个阶段所有 token 并行计算矩阵乘法，计算密度非常高，GPU 的算力利用率能到 90% 以上。瓶颈在算力——GPU 的浮点计算能力决定了这个阶段的速度。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804123256-f893fde1.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第二个阶段叫解码（Decode），就是逐个生成输出 token。每生成一个 token，都要把整个 KV Cache 从显存里读一遍来做注意力计算，但每次只产出一个 token 的计算量。计算量小，数据搬运量大，GPU 大部分时间在等数据从显存传过来。这时候瓶颈在内存带宽。”</p>
 <p>“一句话概括就是，Prefill 阶段是算得慢，Decode 阶段是读得慢。”</p>` },
-      { "t": "04、多 Agent 并发运行为什么更容易产生 OOM？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“原因是每个 Agent 都有自己独立的内存开销，N 个 Agent 并发就是 N 倍。”</p>
+      { "t": "04、多 Agent 并发运行为什么更容易产生 OOM？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“原因是每个 Agent 都有自己独立的内存开销，N 个 Agent 并发就是 N 倍。”</p>
 <p>“单个 Agent 运行时至少要维护三份数据：当前对话的上下文窗口、工具调用返回的结果缓存、还有从记忆库检索回来的历史信息。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804123606-849f770a.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“多 Agent 并发的问题在于，这些开销不共享。每个 Agent 有自己的对话历史，有自己的工具调用结果，有自己的任务状态。就算 system prompt 相同可以共享缓存，动态生成的部分也没办法复用。”</p>` },
-      { "t": "05、Agent 的工作记忆、情景记忆和长期记忆应该如何分层？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王放下茶杯，翻了翻简历背面。“说说你对 Agent 记忆分层的理解。工作记忆、情景记忆、长期记忆，怎么分？”</p>
+      { "t": "05、Agent 的工作记忆、情景记忆和长期记忆应该如何分层？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王放下茶杯，翻了翻简历背面。“说说你对 Agent 记忆分层的理解。工作记忆、情景记忆、长期记忆，怎么分？”</p>
 <p>“工作记忆对应当前的上下文窗口。当前对话的内容、system prompt、工具调用的结果，全在这里。”</p>
 <p>“情景记忆存的是过往交互的日志。比如上周和用户聊过什么、之前执行过哪些任务、哪些成功了哪些失败了。按时间和场景索引，需要的时候检索出来注入工作记忆。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804123947-63043d3a.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
@@ -2678,14 +2551,12 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p>“第一，上下文窗口有上限。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804124342-c30eb745.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“第二，注意力稀释。Transformer 的注意力机制在上下文越长的时候，对每个 token 的关注度越分散。塞进去太多无关信息，模型反而更容易忽略真正重要的内容。分层的目的就是让工作记忆里只保留当前任务最需要的信息，其余的按需检索。”</p>` },
-      { "t": "06、Redis、向量数据库、关系数据库和对象存储分别适合保存什么 Agent 数据？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“Redis 适合存会话状态和短期缓存。Agent 的当前会话 ID、最近几轮对话历史、工具调用的临时结果，这些数据访问频率高、生命周期短。Redis 的读写速度快，TTL（自动过期）机制能自动清理过期数据。PaiCLI 的会话状态就存在 Redis 里，7 天自动过期。”</p>
+      { "t": "06、Redis、向量数据库、关系数据库和对象存储分别适合保存什么 Agent 数据？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“Redis 适合存会话状态和短期缓存。Agent 的当前会话 ID、最近几轮对话历史、工具调用的临时结果，这些数据访问频率高、生命周期短。Redis 的读写速度快，TTL（自动过期）机制能自动清理过期数据。PaiCLI 的会话状态就存在 Redis 里，7 天自动过期。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804124730-37f83d7e.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“向量数据库适合存语义记忆。知识库文档切块之后生成向量索引，用户提问时做相似度检索。关键词匹配找不到的东西，语义检索能找到。派聪明用的是 Elasticsearch 的混合检索，BM25 关键词匹配和向量语义检索并行跑，结果合并排序。”</p>
 <p>“关系数据库适合存结构化的业务数据。用户信息、任务执行记录、审计日志、评估结果，这些数据需要事务保障和复杂查询能力。Agent 的审计日志尤其重要——谁在什么时间调用了什么工具、结果是什么、有没有经过人工审批，这些都要可追溯。”</p>
 <p>“对象存储适合存大文件和长期归档。用户上传的文档、Agent 生成的报告、对话历史的原始日志，数据量大但访问频率低。对象存储容量大、成本低，适合做冷数据的落盘。”</p>` },
-      { "t": "07、如何设计上下文压缩，避免 Agent 运行时间越长、Token 消耗越大？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王看了一眼手表，无名指上的戒指反了一下光。“上下文管理是 Agent 工程化绕不开的问题。聊聊你们怎么做压缩的。”</p>
+      { "t": "07、如何设计上下文压缩，避免 Agent 运行时间越长、Token 消耗越大？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王看了一眼手表，无名指上的戒指反了一下光。“上下文管理是 Agent 工程化绕不开的问题。聊聊你们怎么做压缩的。”</p>
 <p>“思路是‘近处保全、远处摘要’。”</p>
 <p>“最近 N 轮对话保持原样，一个字都不动。PaiCLI 默认保留最近 3 轮。因为用户最近说的话大概率和当前任务直接相关，压缩了会丢失关键信息。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804125116-c8e0db19.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
@@ -2697,13 +2568,11 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804125547-917fb648.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“假如 Agent 在第 3 轮和用户确认了一个重要的设计决策，到第 20 轮的时候这条消息被截断了。Agent 就忘了这个决策。摘要至少能把关键信息的语义保留下来，虽然细节模糊了，但核心结论还在。”</p>
 <p>“当然，如果 LLM 摘要调用失败了，PaiCLI 也会降级到简单截断。”</p>` },
-      { "t": "08、KV Cache 量化、分页和卸载分别解决什么问题？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“量化解决的是‘单个 KV 太大’的问题。把 KV Cache 从 BF16 精度降到 INT8，每个元素从 2 字节变成 1 字节，显存占用直接减半。INT8 量化几乎无损，对生成质量的影响很小。继续降到 INT4 可以再减半，但精度损失会比较明显，适合对质量要求不那么高的场景。”</p>
+      { "t": "08、KV Cache 量化、分页和卸载分别解决什么问题？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“量化解决的是‘单个 KV 太大’的问题。把 KV Cache 从 BF16 精度降到 INT8，每个元素从 2 字节变成 1 字节，显存占用直接减半。INT8 量化几乎无损，对生成质量的影响很小。继续降到 INT4 可以再减半，但精度损失会比较明显，适合对质量要求不那么高的场景。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804130138-4510efe6.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“分页解决的是‘内存碎片’的问题。传统做法是给每个序列预分配一块连续的显存来放 KV Cache，但序列长度事先不确定——分多了浪费，分少了不够用。vLLM 的 PagedAttention 把 KV Cache 切成固定大小的页，按需分配，不要求连续存储。就像操作系统的虚拟内存分页一样。好处是多个序列可以共享相同前缀的页，比如 system prompt 部分只存一份。”</p>
 <p>“卸载解决的是‘显存放不下’的问题。把暂时用不到的 KV Cache 搬到 SSD 上，需要的时候再搬回来。本质是拿延迟换容量，适合超长上下文的离线任务。”</p>` },
-      { "t": "09、一个长时间运行的 Agent，如何实现状态持久化和故障恢复？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“靠快照机制。”</p>
+      { "t": "09、一个长时间运行的 Agent，如何实现状态持久化和故障恢复？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>“靠快照机制。”</p>
 <p>“思路是每轮执行前后各打一次快照。pre-turn 快照在 LLM 调用之前保存当前状态，post-turn 快照在这一轮执行完之后异步保存。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804130541-064bf249.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“快照里存的是 Agent 的完整运行状态：对话历史、记忆内容、任务进度、工具调用结果、当前执行到哪个步骤。这些信息整合在一起，才能完整还原 Agent 中断前的状态。”</p>
@@ -2712,8 +2581,7 @@ chunk 4: tool_calls[0].function.arguments = 'th":"x"}' → StringBuilder.append(
 <h4>为什么不用数据库事务来保障一致性？</h4>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804131045-40cbde3b.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
 <p>“数据库事务保障的是单行或多行数据的原子性。但 Agent 的状态横跨对话历史、记忆存储、任务进度、工具调用结果，这些可能分布在不同的存储里。跨存储的分布式事务成本太高，快照做全量保存、恢复时全量加载，反而更简单可靠。”</p>` },
-      { "t": "10、如果 Agent 突然出现延迟升高，应当监控 Token、显存、内存和工具调用中的哪些指标？", "tag": "技术派·长鑫存储", "p": "core", "html": `` },
-      { "t": "文章导读与背景", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王把简历翻回正面放好。“最后一题，偏实际运维的。Agent 突然变慢了，你怎么排查？”</p>
+      { "t": "10、如果 Agent 突然出现延迟升高，应当监控 Token、显存、内存和工具调用中的哪些指标？", "tag": "技术派·长鑫存储", "p": "core", "html": `<p>老王把简历翻回正面放好。“最后一题，偏实际运维的。Agent 突然变慢了，你怎么排查？”</p>
 <p>“分四个维度看。”</p>
 <p>“Token 维度先查输入 token 数。如果最近几轮的输入 token 突然变大，说明上下文在膨胀——可能是压缩没触发，也可能是某次工具调用返回了大量数据没做截断。再查 Prompt Cache 的命中率，命中率下降意味着每次请求都要重新计算完整的上下文，延迟和成本同时上升。”</p>
 <p><img src="assets/jimg/agent-mianshi-changxin-20260804131506-1f26ae28.png" decoding="async" loading="lazy" fetchpriority="low" width="1672" height="941"></p>
