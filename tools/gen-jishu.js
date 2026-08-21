@@ -161,16 +161,15 @@ function countImgs(html) {
       if (p.intro) { introBuf = (introBuf + '\n' + p.html).trim(); continue; }
       // flush pending intro as its own "题" if non-empty
       if (introBuf) {
-        questions.push({ t: art.short + ' · 文章导读与背景', tag: '技术派·' + art.short, p: 'core', html: introBuf });
+        questions.push({ t: '文章导读与背景', tag: '技术派·' + art.short, p: 'core', html: introBuf });
         introBuf = '';
       }
-      // strip leading "01、" numbering for display subtitle
-      const qTitle = art.short + ' · ' + p.title;
-      questions.push({ t: qTitle, tag: '技术派·' + art.short, p: 'core', html: p.html.trim() });
+      // keep question title as-is (chapters already carry the module name)
+      questions.push({ t: p.title, tag: '技术派·' + art.short, p: 'core', html: p.html.trim() });
     }
     if (introBuf) {
       // trailing intro blocks merged into a final导读
-      questions.push({ t: art.short + ' · 文章结语', tag: '技术派·' + art.short, p: 'core', html: introBuf });
+      questions.push({ t: '文章结语', tag: '技术派·' + art.short, p: 'core', html: introBuf });
     }
     if (!questions.length) continue;
 
