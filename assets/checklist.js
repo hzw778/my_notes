@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var TAB_ORDER = ["mine", "route", "java", "agent", "redis", "mysql", "llm", "rag", "concurrent", "mq", "net"];
+  var TAB_ORDER = ["mine-paizi", "mine-rag", "mine-mianshi", "mine-agent", "mine-qoder", "mine-jishu", "route", "java", "agent", "redis", "mysql", "llm", "rag", "concurrent", "mq", "net"];
   var TAB_SHORT = {
     overview: "总览",
     mine: "我的整理",
@@ -15,6 +15,13 @@
     concurrent: "并发编程",
     mq: "消息队列",
     net: "计算机网络",
+    mine: "我的整理",
+    "mine-paizi": "派聪明知识点",
+    "mine-rag": "派聪明RAG简历",
+    "mine-mianshi": "面试题收集",
+    "mine-agent": "agent面经",
+    "mine-qoder": "QODER笔记",
+    "mine-jishu": "技术派",
     docker: "Docker",
     claudecode: "ClaudeCode",
     es: "ElasticSearch",
@@ -86,16 +93,18 @@
   var state = { tab: "overview", filter: {}, query: {} };
   var docStats = [];
 
-  /* ---------- Mine-scope (each local note opens only its own chapters) ---------- */
-  var SCOPE_LABEL = {
-    paizi: "派聪明知识点（技术派）",
-    ragjianli: "派聪明RAG简历（含面经收集）",
-    qiyemianshi: "面试题收集（企业面经）",
-    agentmianjing: "agent面经收集",
-    qoder: "派聪明QORDER_NOTE",
-    jishu: "技术派 · 面试篇"
+  /* ---------- 本地笔记拆分：mine 聚合数据 → 6 个独立笔记 Tab ---------- */
+  var MINE_KEYS = ["mine-paizi", "mine-rag", "mine-mianshi", "mine-agent", "mine-qoder", "mine-jishu"];
+  var MINE_SCOPE_MAP = { paizi: "mine-paizi", ragjianli: "mine-rag", qiyemianshi: "mine-mianshi", agentmianjing: "mine-agent", qoder: "mine-qoder", jishu: "mine-jishu" };
+  var MINE_TITLES = {
+    "mine-paizi": "派聪明知识点（技术派）",
+    "mine-rag": "派聪明RAG简历（含面经收集）",
+    "mine-mianshi": "面试题收集（企业面经）",
+    "mine-agent": "agent面经收集",
+    "mine-qoder": "派聪明QORDER_NOTE",
+    "mine-jishu": "技术派·面试篇"
   };
-  function chapterScope(title) {
+  function mineScopeOf(title) {
     if (title.indexOf("技术派·") >= 0) return "jishu";
     if (title.indexOf("派聪明知识点") >= 0) return "paizi";
     if (title.indexOf("派聪明RAG简历") >= 0) return "ragjianli";
@@ -103,40 +112,19 @@
     if (title.indexOf("agent面经") >= 0) return "agentmianjing";
     return "qoder";
   }
-  var mineScope = null;
-  var pendingMineScope = null;
-  function applyMineScope() {
-    var panel = document.getElementById("panel-mine");
-    if (!panel) return;
-    var sc = mineScope;
-    panel.querySelectorAll(".chapter").forEach(function (sec) {
-      var h = sec.querySelector("h2");
-      var title = h ? h.textContent : "";
-      var match = sc == null || chapterScope(title) === sc;
-      sec.classList.toggle("hidden-chapter", !match);
+  (function splitMineNotes() {
+    var src = window.TAB_DATA["mine"];
+    if (!src || !src.chapters) return;
+    var buckets = {};
+    MINE_KEYS.forEach(function (k) { buckets[k] = []; });
+    src.chapters.forEach(function (c) {
+      var key = MINE_SCOPE_MAP[mineScopeOf(c.title)];
+      if (key && buckets[key]) buckets[key].push(c);
     });
-    var banner = document.getElementById("mine-scope-banner");
-    if (banner) {
-      if (sc) {
-        banner.style.display = "";
-        var titleEl = document.getElementById("mine-scope-title");
-        if (titleEl) titleEl.textContent = SCOPE_LABEL[sc] || sc;
-      } else {
-        banner.style.display = "none";
-      }
-    }
-    refreshTab("mine");
-  }
-  function clearMineScope() {
-    mineScope = null;
-    pendingMineScope = null;
-    applyMineScope();
-  }
-  function enterMineScope(scope) {
-    pendingMineScope = scope;
-    switchTab("mine");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+    MINE_KEYS.forEach(function (k) {
+      window.TAB_DATA[k] = { key: k, title: MINE_TITLES[k], url: "", chapters: buckets[k] };
+    });
+  })();
 
   /* ---------- Panels (core static, others dynamic) ---------- */
   function buildPanels() {
@@ -175,12 +163,6 @@
 
   function switchTab(key) {
     state.tab = key;
-    if (key === "mine") {
-      if (pendingMineScope) { mineScope = pendingMineScope; pendingMineScope = null; }
-      else { mineScope = null; }
-    } else {
-      mineScope = null; pendingMineScope = null;
-    }
     document.querySelectorAll(".tabbtn").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-tab") === key);
     });
@@ -191,7 +173,6 @@
     var cur = (location.hash || "").replace(/^#/, "");
     if (cur !== key && key) { try { history.replaceState(null, "", "#" + key); } catch (e) {} }
     if (OTHER_KEYS.indexOf(key) >= 0 && !othersLoaded) loadOthers();
-    if (key === "mine" && mineScope) applyMineScope();
   }
 
   /* ---------- Lazy-load other docs ---------- */
@@ -276,8 +257,7 @@
         else stTxt = "无权限";
         var goto = null;
         if (!isPdf && !it.href) {
-          if (it.status === "mine") goto = "mine";
-          else if (it.key && DATA[it.key]) goto = it.key;
+          if (it.key && DATA[it.key]) goto = it.key;
           else if (it.status === "list") goto = it.key;
         }
         if (goto) desc += " · 点击进入";
@@ -285,7 +265,6 @@
         if (isPdf) attrs += ' data-pdf="' + esc(url) + '" data-pdf-title="' + esc(cleanTitle(it.title)) + '"';
         else if (goto) attrs += ' data-goto="' + goto + '"';
         else attrs += ' target="_blank" rel="noopener"';
-        if (goto === "mine" && it.scope) attrs += ' data-miner="' + esc(it.scope) + '"';
         html += '<a class="linkcard" ' + attrs + ">" +
           '<span class="ic">' + (it.icon || "📄") + "</span>" +
           '<span class="meta"><span class="t">' + esc(cleanTitle(it.title)) + "</span>" +
@@ -305,8 +284,6 @@
       var card = e.target.closest(".linkcard[data-goto]");
       if (!card) return;
       e.preventDefault();
-      var miner = card.getAttribute("data-miner");
-      if (miner) { enterMineScope(miner); return; }
       switchTab(card.getAttribute("data-goto"));
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -340,6 +317,14 @@
   /* ---------- Tech tab (core, with answers) ---------- */
   function renderTechTab(key) {
     var panel = document.getElementById("panel-" + key);
+    if (!panel) {
+      var wrap = document.querySelector(".wrap");
+      if (!wrap) return;
+      panel = document.createElement("section");
+      panel.className = "panel";
+      panel.id = "panel-" + key;
+      wrap.appendChild(panel);
+    }
     var d = DATA[key];
     var pris = {};
     var total = 0;
@@ -351,11 +336,6 @@
              : "<strong>" + esc(d.title) + "</strong>（本地 Markdown 笔记解析）") + "</p>";
 
     var gid = 0;
-    if (key === "mine") {
-      html += '<div id="mine-scope-banner" class="scope-banner" style="display:none">' +
-        '<span class="scope-banner-txt">正在定位：<strong id="mine-scope-title"></strong></span>' +
-        '<button type="button" id="mine-scope-close" class="scope-close">显示全部章节</button></div>';
-    }
     html += '<div data-chapters="' + key + '">';
     d.chapters.forEach(function (c) {
       html += '<section class="chapter">';
@@ -380,14 +360,6 @@
     });
     html += "</div>";
     panel.innerHTML = html;
-    if (key === "mine") {
-      var closeBtn = document.getElementById("mine-scope-close");
-      if (closeBtn) closeBtn.addEventListener("click", function () {
-        clearMineScope();
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
-      applyMineScope();
-    }
   }
 
   /* ---------- Other doc tab (each ext doc = one tab) ---------- */
